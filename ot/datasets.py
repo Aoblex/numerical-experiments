@@ -33,7 +33,7 @@ class MnistOT:
 
         self.source_distribution = self._get_distribution(source_idx)
         self.target_distribution = self._get_distribution(target_idx)
-        self.cost_matrix = self._get_cost_matrix()
+        self.cost_matrix = self._get_cost_matrix(distance)
         self.description = f"MNIST.{source_idx}.{target_idx}.norm={distance}.reg={reg}"
     
     @property
@@ -54,7 +54,7 @@ class MnistOT:
         dist = digit_np / np.sum(digit_np)
         return (1 - eps) * dist + eps / self.n_flattend
          
-    def _get_cost_matrix(self, normailze: bool = True) -> None:
+    def _get_cost_matrix(self, distance: str | Callable = 'l2') -> None:
         """Get the cost matrix"""
         if distance == 'l1' or 'cityblock':
             distance = lambda x, y: np.linalg.norm(x - y, ord=1)
@@ -72,7 +72,7 @@ class MnistOT:
             for j in range(MnistOT.n_flattend):
                 cost_matrix[i, j] = distance(coordinates[i], coordinates[j])
         
-        return cost_matrix / np.max(cost_matrix) if normailze else cost_matrix
+        return cost_matrix / np.max(cost_matrix)
     
 
 class FashionMnistOT:
@@ -95,7 +95,7 @@ class FashionMnistOT:
 
         self.source_distribution = self._get_distribution(source_idx)
         self.target_distribution = self._get_distribution(target_idx)
-        self.cost_matrix = self._get_cost_matrix()
+        self.cost_matrix = self._get_cost_matrix(distance)
         self.description = f"FashionMNIST.{source_idx}.{target_idx}.norm={distance}.reg={reg}"
     
     @property
@@ -116,7 +116,7 @@ class FashionMnistOT:
         dist = digit_np / np.sum(digit_np)
         return (1 - eps) * dist + eps / self.n_flattend
     
-    def _get_cost_matrix(self, normailze: bool = True) -> None:
+    def _get_cost_matrix(self, distance: str | Callable = 'l2') -> None:
         """Get the cost matrix"""
         if distance == 'l1' or 'cityblock':
             distance = lambda x, y: np.linalg.norm(x - y, ord=1)
@@ -134,7 +134,7 @@ class FashionMnistOT:
             for j in range(FashionMnistOT.n_flattend):
                 cost_matrix[i, j] = distance(coordinates[i], coordinates[j])
         
-        return cost_matrix / np.max(cost_matrix) if normailze else cost_matrix
+        return cost_matrix / np.max(cost_matrix)
     
 
 class ImagenetteOT:
@@ -184,9 +184,9 @@ class ImagenetteOT:
         self._process_Imagenette()
 
         """Set the source/target distribution and the cost matrix"""
-        self.source_distribution = self._get_distribution(self.source_classname)
-        self.target_distribution = self._get_distribution(self.target_classname)
-        self.cost_matrix = self._get_cost_matrix(self.source_classname, self.target_classname, self.distance)
+        self.source_distribution = self._get_distribution(source_classname)
+        self.target_distribution = self._get_distribution(target_classname)
+        self.cost_matrix = self._get_cost_matrix(source_classname, target_classname, distance)
         self.description = f"Imagenette.{source_classname}.{target_classname}.dim={dim}.norm={distance}.reg={reg}"
 
     @property
@@ -304,6 +304,7 @@ class Synthetic1OT:
         self.source_distribution = np.ones(n) / n
         self.target_distribution = np.ones(m) / m
         self.cost_matrix = self.rng.uniform(0, 1, (n, m))
+        self.description = f"Synthetic1.n={n}.m={m}"
     
     @property
     def a(self):
@@ -332,6 +333,7 @@ class Synthetic2OT:
         self.target_distribution = target_density(x2) / np.sum(target_density(x2))
         self.cost_matrix = np.square(x1.reshape(n, 1) - x2.reshape(1, m))
         self.cost_matrix = self.cost_matrix / np.max(self.cost_matrix)
+        self.description = f"Synthetic2.n={n}.m={m}"
     
     @property
     def a(self):
