@@ -10,10 +10,42 @@ from torchvision.models.resnet import ResNet18_Weights
 from sklearn.decomposition import PCA
 from .objectives import SinkhornOT
 from scipy.stats import expon, norm
+from abc import abstractmethod
 
 ROOT = './data'
 
-class MnistOT:
+class BaseOT:
+
+    def __init__(
+        self,
+    ) -> None:
+        self.source_distribution = None
+        self.target_distribution = None
+        self.cost_matrix = None
+        self.description = None
+
+    @abstractmethod
+    def _get_distribution(self, *args, **kwargs) -> np.ndarray:
+        raise NotImplementedError
+    
+    @abstractmethod
+    def _get_cost_matrix(self, *args, **kwargs) -> np.ndarray:
+        raise NotImplementedError
+    
+    @property
+    def a(self) -> np.ndarray:
+        return self.source_distribution
+    
+    @property
+    def b(self) -> np.ndarray:
+        return self.target_distribution
+    
+    @property
+    def M(self) -> np.ndarray:
+        return self.cost_matrix
+
+
+class MnistOT(BaseOT):
     n, n_flattend = 28, 784
     def __init__(
         self,
@@ -36,18 +68,6 @@ class MnistOT:
         self.cost_matrix = self._get_cost_matrix(distance)
         self.description = f"MNIST.{source_idx}.{target_idx}.norm={distance}.reg={reg}"
     
-    @property
-    def a(self):
-        return self.source_distribution
-
-    @property
-    def b(self):
-        return self.target_distribution
-    
-    @property
-    def M(self):
-        return self.cost_matrix
-
     def _get_distribution(self, idx: int, eps: float = 0.001) -> np.ndarray:
         """Get the smoothed source/target distribution"""
         digit_np = self.mnist[idx][0]
@@ -75,7 +95,7 @@ class MnistOT:
         return cost_matrix / np.max(cost_matrix)
     
 
-class FashionMnistOT:
+class FashionMnistOT(BaseOT):
     n, n_flattend = 28, 784
     def __init__(
         self,
@@ -97,18 +117,6 @@ class FashionMnistOT:
         self.target_distribution = self._get_distribution(target_idx)
         self.cost_matrix = self._get_cost_matrix(distance)
         self.description = f"FashionMNIST.{source_idx}.{target_idx}.norm={distance}.reg={reg}"
-    
-    @property
-    def a(self):
-        return self.source_distribution
-
-    @property
-    def b(self):
-        return self.target_distribution
-    
-    @property
-    def M(self):
-        return self.cost_matrix
     
     def _get_distribution(self, idx: int, eps: float = 0.001) -> np.ndarray:
         """Get the smoothed source/target distribution"""
@@ -137,7 +145,7 @@ class FashionMnistOT:
         return cost_matrix / np.max(cost_matrix)
     
 
-class ImagenetteOT:
+class ImagenetteOT(BaseOT):
     """
     The Imagenette dataset is a subset of 10 classes from the Imagenet dataset.
     [
@@ -188,18 +196,6 @@ class ImagenetteOT:
         self.target_distribution = self._get_distribution(target_classname)
         self.cost_matrix = self._get_cost_matrix(source_classname, target_classname, distance)
         self.description = f"Imagenette.{source_classname}.{target_classname}.dim={dim}.norm={distance}.reg={reg}"
-
-    @property
-    def a(self):
-        return self.source_distribution
-
-    @property
-    def b(self):
-        return self.target_distribution
-    
-    @property
-    def M(self):
-        return self.cost_matrix
 
     def _get_classname(self, idx: int):
         """Get the classname: select the first name"""
@@ -289,7 +285,7 @@ class ImagenetteOT:
 
         return cost_matrix / np.max(cost_matrix)
 
-class Synthetic1OT:
+class Synthetic1OT(BaseOT):
 
     def __init__(
         self,
@@ -306,19 +302,7 @@ class Synthetic1OT:
         self.cost_matrix = self.rng.uniform(0, 1, (n, m))
         self.description = f"Synthetic1.n={n}.m={m}"
     
-    @property
-    def a(self):
-        return self.source_distribution
-    
-    @property
-    def b(self):
-        return self.target_distribution
-    
-    @property
-    def M(self):
-        return self.cost_matrix
-    
-class Synthetic2OT:
+class Synthetic2OT(BaseOT):
 
     def __init__(
         self,
@@ -334,15 +318,3 @@ class Synthetic2OT:
         self.cost_matrix = np.square(x1.reshape(n, 1) - x2.reshape(1, m))
         self.cost_matrix = self.cost_matrix / np.max(self.cost_matrix)
         self.description = f"Synthetic2.n={n}.m={m}"
-    
-    @property
-    def a(self):
-        return self.source_distribution
-    
-    @property
-    def b(self):
-        return self.target_distribution
-    
-    @property
-    def M(self):
-        return self.cost_matrix
