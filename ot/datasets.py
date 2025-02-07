@@ -9,21 +9,52 @@ import torchvision.models as models
 from torchvision.models.resnet import ResNet18_Weights
 from sklearn.decomposition import PCA
 from .objectives import SinkhornOT
+from scipy.stats import expon, norm
+
+ROOT = './data'
 
 class MnistOT:
     n, n_flattend = 28, 784
-    def __init__(self, root: str, train: bool = True, download: bool = True) -> None:
+    def __init__(
+        self,
+        source_idx: int = 2,
+        target_idx: int = 54698,
+        root: str = ROOT,
+        reg: float = 0.01,
+        distance: str | Callable = 'l2',
+    ) -> None:
         """Initialize the MNIST dataset"""
-        self.mnist = torchvision.datasets.MNIST(root=root, train=train, download=download,
+        self.mnist = torchvision.datasets.MNIST(root=root, train=True, download=True,
                                                 transform=lambda pic: np.float64(pic).flatten())
+        self.distance = distance
+        self.source_idx = source_idx
+        self.target_idx = target_idx
+        self.reg = reg
 
-    def get_distribution(self, idx: int, eps: float = 0.001) -> np.ndarray:
+        self.source_distribution = self._get_distribution(source_idx)
+        self.target_distribution = self._get_distribution(target_idx)
+        self.cost_matrix = self._get_cost_matrix()
+        self.description = f"MNIST.{source_idx}.{target_idx}.norm={distance}.reg={reg}"
+    
+    @property
+    def a(self):
+        return self.source_distribution
+
+    @property
+    def b(self):
+        return self.target_distribution
+    
+    @property
+    def M(self):
+        return self.cost_matrix
+
+    def _get_distribution(self, idx: int, eps: float = 0.001) -> np.ndarray:
         """Get the smoothed source/target distribution"""
         digit_np = self.mnist[idx][0]
         dist = digit_np / np.sum(digit_np)
         return (1 - eps) * dist + eps / self.n_flattend
          
-    def get_cost_matrix(self, distance: str | Callable = 'l2', normailze: bool = True) -> np.ndarray:
+    def _get_cost_matrix(self, normailze: bool = True) -> None:
         """Get the cost matrix"""
         if distance == 'l1' or 'cityblock':
             distance = lambda x, y: np.linalg.norm(x - y, ord=1)
@@ -43,27 +74,49 @@ class MnistOT:
         
         return cost_matrix / np.max(cost_matrix) if normailze else cost_matrix
     
-    def get_SinkhornOT(self, source_idx: int, target_idx: int,
-                      distance: str | Callable = 'l2', reg: float = 0.01) -> SinkhornOT:
-        source_distribution = self.get_distribution(source_idx)
-        target_distribution = self.get_distribution(target_idx)
-        cost_matrix = self.get_cost_matrix(distance)
-        return SinkhornOT(source_distribution, target_distribution, cost_matrix, reg)
-                
+
 class FashionMnistOT:
     n, n_flattend = 28, 784
-    def __init__(self, root: str, train: bool = True, download: bool = True):
-        """Initialize the Fashion MNIST dataset"""
-        self.fashion_mnist = torchvision.datasets.FashionMNIST(root=root, train=train, download=download,
-                                                transform=lambda pic: np.float64(pic).flatten())
+    def __init__(
+        self,
+        source_idx: int = 2,
+        target_idx: int = 54698,
+        root: str = ROOT,
+        reg: float = 0.01,
+        distance: str | Callable = 'l2',
+    ) -> None:
+        """Initialize the FashionMNIST dataset"""
+        self.fashion_mnist = torchvision.datasets.FashionMNIST(root=root, train=True, download=True,
+                                                               transform=lambda pic: np.float64(pic).flatten())
+        self.distance = distance
+        self.source_idx = source_idx
+        self.target_idx = target_idx
+        self.reg = reg
 
-    def get_distribution(self, idx: int, eps: float = 0.001):
+        self.source_distribution = self._get_distribution(source_idx)
+        self.target_distribution = self._get_distribution(target_idx)
+        self.cost_matrix = self._get_cost_matrix()
+        self.description = f"FashionMNIST.{source_idx}.{target_idx}.norm={distance}.reg={reg}"
+    
+    @property
+    def a(self):
+        return self.source_distribution
+
+    @property
+    def b(self):
+        return self.target_distribution
+    
+    @property
+    def M(self):
+        return self.cost_matrix
+    
+    def _get_distribution(self, idx: int, eps: float = 0.001) -> np.ndarray:
         """Get the smoothed source/target distribution"""
         digit_np = self.fashion_mnist[idx][0]
         dist = digit_np / np.sum(digit_np)
         return (1 - eps) * dist + eps / self.n_flattend
     
-    def get_cost_matrix(self, distance: str | Callable = 'l2', normailze: bool = True):
+    def _get_cost_matrix(self, normailze: bool = True) -> None:
         """Get the cost matrix"""
         if distance == 'l1' or 'cityblock':
             distance = lambda x, y: np.linalg.norm(x - y, ord=1)
@@ -83,16 +136,39 @@ class FashionMnistOT:
         
         return cost_matrix / np.max(cost_matrix) if normailze else cost_matrix
     
-    def get_SinkhornOT(self, source_idx: int, target_idx: int,
-                        distance: str | Callable = 'l2', reg: float = 0.01) -> SinkhornOT:
-        source_distribution = self.get_distribution(source_idx)
-        target_distribution = self.get_distribution(target_idx)
-        cost_matrix = self.get_cost_matrix(distance)
-        return SinkhornOT(source_distribution, target_distribution, cost_matrix, reg)
 
 class ImagenetteOT:
-
-    def __init__(self, root: str, split: str = 'train', size: str = 'full', download: bool = True, dim: int = 30):
+    """
+    The Imagenette dataset is a subset of 10 classes from the Imagenet dataset.
+    [
+        ('tench', 'Tinca tinca'),
+        ('English springer', 'English springer spaniel'),
+        ('cassette player',),
+        ('chain saw', 'chainsaw'),
+        ('church', 'church building'),
+        ('French horn', 'horn'),
+        ('garbage truck', 'dustcart'),
+        ('gas pump', 'gasoline pump', 'petrol pump', 'island dispenser'),
+        ('golf ball',),
+        ('parachute', 'chute')
+    ]
+    """
+    def __init__(
+        self,
+        source_classname: str = 'tench',
+        target_classname: str = 'cassette player',
+        root: str = ROOT,
+        dim: int = 30,
+        reg: float = 0.01,
+        distance: str | Callable = 'l2',
+    ) -> None:
+        """Initialize the parameters"""
+        self.source_classname = source_classname
+        self.target_classname = target_classname
+        self.root = root
+        self.dim = dim
+        self.reg = reg
+        self.distance = distance
 
         """Initialize the Resnet18 model"""
         self.resnet18 = models.resnet18(weights=ResNet18_Weights.IMAGENET1K_V1)
@@ -102,16 +178,32 @@ class ImagenetteOT:
         self.resnet18_transforms = ResNet18_Weights.IMAGENET1K_V1.transforms()
 
         """Initialize the Imagenette dataset"""
-        self.root = root
-        self.dim = dim
         # transform: prepare the images for the Resnet18 model
-        self.Imagenette = torchvision.datasets.Imagenette(root=root, split=split, size=size, download=download,
+        self.Imagenette = torchvision.datasets.Imagenette(root=root, split='train', size='full', download=True,
                                                           transform=self.resnet18_transforms)
         self._process_Imagenette()
+
+        """Set the source/target distribution and the cost matrix"""
+        self.source_distribution = self._get_distribution(self.source_classname)
+        self.target_distribution = self._get_distribution(self.target_classname)
+        self.cost_matrix = self._get_cost_matrix(self.source_classname, self.target_classname, self.distance)
+        self.description = f"Imagenette.{source_classname}.{target_classname}.dim={dim}.norm={distance}.reg={reg}"
+
+    @property
+    def a(self):
+        return self.source_distribution
+
+    @property
+    def b(self):
+        return self.target_distribution
     
     @property
-    def class2idx(self):
-        return self.Imagenette.class_to_idx
+    def M(self):
+        return self.cost_matrix
+
+    def _get_classname(self, idx: int):
+        """Get the classname: select the first name"""
+        return self.Imagenette.classes[idx][0]
 
     def _get_layer_output(self, input_tensor: torch.Tensor, layer_name: str) -> torch.Tensor:
         """Given a single picture, get the output of the layer according to the layer name"""
@@ -128,17 +220,13 @@ class ImagenetteOT:
         # if the layer name is not found, return the last layer
         return input_tensor.squeeze().numpy()
     
-    def _get_classname(self, idx: int):
-        """Get the classname: select the first name"""
-        return self.Imagenette.classes[idx][0]
-    
     def read_all_class(self):
         """Read the processed Imagenette dataset"""
         save_path = os.path.join(self.root, f'imagenette2-{self.dim}.pkl')
         with open(save_path, 'rb') as f:
             return pickle.load(f)
 
-    def read_processed_class(self, classname: str):
+    def read_processed_class(self, classname: str) -> np.ndarray:
         """Read the processed Imagenette dataset"""
         save_path = os.path.join(self.root, f'imagenette2-{self.dim}.pkl')
         with open(save_path, 'rb') as f:
@@ -174,14 +262,14 @@ class ImagenetteOT:
         with open(save_path, 'wb') as f:
             pickle.dump(input_dict, f)
 
-    def get_distribution(self, classname: str) -> np.ndarray:
+    def _get_distribution(self, classname: str) -> np.ndarray:
         # vectors is an ndarray of shape (n, dim), where n is the number of images in the class
         vectors = self.read_processed_class(classname)
         n = vectors.shape[0]
         return 1.0 / n * np.ones(n)
     
-    def get_cost_matrix(self, source_classname: str, target_classname: str,
-                        distance: str | Callable = 'l2', normalize: bool = True) -> np.ndarray:
+    def _get_cost_matrix(self, source_classname: str, target_classname: str,
+                        distance: str | Callable = 'l2') -> np.ndarray:
         """Get the distance of the cost matrix"""
         if distance == 'l1' or 'cityblock':
             distance = lambda x, y: np.linalg.norm(x - y, ord=1)
@@ -199,67 +287,60 @@ class ImagenetteOT:
             for j in range(m):
                 cost_matrix[i, j] = distance(source_vector[i], target_vector[j])
 
-        return cost_matrix / np.max(cost_matrix) if normalize else cost_matrix
-    
-    def get_SinkhornOT(self, source_classname: str, target_classname: str,
-                       distance: str | Callable = 'l2', reg: float = 0.01) -> SinkhornOT:
-        source_distribution = self.get_distribution(source_classname)
-        target_distribution = self.get_distribution(target_classname)
-        cost_matrix = self.get_cost_matrix(source_classname, target_classname, distance)
-        return SinkhornOT(source_distribution, target_distribution, cost_matrix, reg)
+        return cost_matrix / np.max(cost_matrix)
 
-class SyntheticOT:
+class Synthetic1OT:
 
-    def __init__(self, n: int = 100, m: int = 100, seed: int = 42):
+    def __init__(
+        self,
+        n: int = 100,
+        m: int = 100,
+        seed: int = 42,
+    ) -> None:
         """Initialize the synthetic dataset"""
         self.n = n
         self.m = m
         self.rng = np.random.default_rng(seed)
+        self.source_distribution = np.ones(n) / n
+        self.target_distribution = np.ones(m) / m
+        self.cost_matrix = self.rng.uniform(0, 1, (n, m))
     
-    def get_points(self, size: int, spacing: str = 'uniform', low: float = 0.0, high: float = 5.0):
-        """Get the points"""
-        if spacing == 'uniform':
-            return np.linspace(low, high, size)
-        elif spacing == 'random':
-            return self.rng.uniform(low, high, size)
+    @property
+    def a(self):
+        return self.source_distribution
+    
+    @property
+    def b(self):
+        return self.target_distribution
+    
+    @property
+    def M(self):
+        return self.cost_matrix
+    
+class Synthetic2OT:
 
-        return np.linspace(low, high, size)
+    def __init__(
+        self,
+        n: int = 100,
+        m: int = 100,
+    ) -> None:
+        x1 = 5 * np.arange(n) / (n - 1)
+        x2 = 5 * np.arange(m) / (m - 1)
+        source_density = lambda x: expon(scale=1.0).pdf(x)
+        target_density = lambda x: 0.2 * norm(loc=1.0, scale=0.2).pdf(x) + 0.8 * norm(loc=3.0, scale=0.5).pdf(x)
+        self.source_distribution = source_density(x1) / np.sum(source_density(x1))
+        self.target_distribution = target_density(x2) / np.sum(target_density(x2))
+        self.cost_matrix = np.square(x1.reshape(n, 1) - x2.reshape(1, m))
+        self.cost_matrix = self.cost_matrix / np.max(self.cost_matrix)
     
-    def get_distribution(self, density_fn: Callable, points: np.ndarray = None):
-        """Get the source/target distribution"""
-        densities = np.array([density_fn(point) for point in points])
-        return densities / np.sum(densities)
+    @property
+    def a(self):
+        return self.source_distribution
     
-    def get_cost_matrix(self, distance: str | Callable = 'l2',
-                        source_points: np.ndarray = None,
-                        target_points: np.ndarray = None,
-                        normalize: bool = True):
-        """Get the cost matrix"""
-        if distance == 'l1' or 'cityblock':
-            distance = lambda x, y: np.linalg.norm(x - y, ord=1)
-        elif distance== 'l2' or 'euclidean':
-            distance = lambda x, y: np.linalg.norm(x - y, ord=2)
-        elif distance == 'l2_squared' or 'sqeuclidean':
-            distance = lambda x, y: np.linalg.norm(x - y, ord=2) ** 2
-        elif distance == 'random':
-            cost_matrix = self.rng.uniform(0, 1, (len(source_points), len(target_points)))
-            return cost_matrix / np.max(cost_matrix) if normalize else cost_matrix
-
-        cost_matrix = np.zeros((len(source_points), len(target_points)))
-        for i in range(len(source_points)):
-            for j in range(len(target_points)):
-                cost_matrix[i, j] = distance(source_points[i], target_points[j])
-        
-        return cost_matrix / np.max(cost_matrix) if normalize else cost_matrix
+    @property
+    def b(self):
+        return self.target_distribution
     
-    def get_SinkhornOT(self, source_density_fn: Callable, target_density_fn: Callable,
-                       source_spacing: str = 'uniform', target_spacing: str = 'uniform',
-                       source_low: float = 0.0, source_high: float = 5.0,
-                       target_low: float = 0.0, target_high: float = 5.0,
-                       distance: str | Callable = 'l2', reg: float = 0.01) -> SinkhornOT:
-        source_points = self.get_points(self.n, source_spacing, source_low, source_high)
-        target_points = self.get_points(self.m, target_spacing, target_low, target_high)
-        source_distribution = self.get_distribution(source_density_fn, source_points)
-        target_distribution = self.get_distribution(target_density_fn, target_points)
-        cost_matrix = self.get_cost_matrix(distance, source_points, target_points)
-        return SinkhornOT(source_distribution, target_distribution, cost_matrix, reg)
+    @property
+    def M(self):
+        return self.cost_matrix
