@@ -66,7 +66,7 @@ class MnistOT(BaseOT):
         self.source_distribution = self._get_distribution(source_idx)
         self.target_distribution = self._get_distribution(target_idx)
         self.cost_matrix = self._get_cost_matrix(distance)
-        self.description = f"MNIST.{source_idx}.{target_idx}.norm={distance}.reg={reg}"
+        self.description = f"MNIST(ID1={source_idx}, ID2={target_idx})[norm={distance}, reg={reg}]"
     
     def _get_distribution(self, idx: int, eps: float = 0.001) -> np.ndarray:
         """Get the smoothed source/target distribution"""
@@ -116,7 +116,7 @@ class FashionMnistOT(BaseOT):
         self.source_distribution = self._get_distribution(source_idx)
         self.target_distribution = self._get_distribution(target_idx)
         self.cost_matrix = self._get_cost_matrix(distance)
-        self.description = f"FashionMNIST.{source_idx}.{target_idx}.norm={distance}.reg={reg}"
+        self.description = f"FashionMNIST(ID1={source_idx}, ID2={target_idx})[norm={distance}, reg={reg}]"
     
     def _get_distribution(self, idx: int, eps: float = 0.001) -> np.ndarray:
         """Get the smoothed source/target distribution"""
@@ -195,7 +195,8 @@ class ImagenetteOT(BaseOT):
         self.source_distribution = self._get_distribution(source_classname)
         self.target_distribution = self._get_distribution(target_classname)
         self.cost_matrix = self._get_cost_matrix(source_classname, target_classname, distance)
-        self.description = f"Imagenette.{source_classname}.{target_classname}.dim={dim}.norm={distance}.reg={reg}"
+        # self.description = f"Imagenette_{source_classname}_{target_classname}_dim={dim}_norm={distance}_reg={reg}"
+        self.description = f"Imagenette({source_classname} vs {target_classname})[norm={distance}, reg={reg}, dim={dim}]"
 
     def _get_classname(self, idx: int):
         """Get the classname: select the first name"""
@@ -291,16 +292,18 @@ class Synthetic1OT(BaseOT):
         self,
         n: int = 100,
         m: int = 100,
+        reg: float = 0.01,
         seed: int = 42,
     ) -> None:
         """Initialize the synthetic dataset"""
         self.n = n
         self.m = m
+        self.reg = reg
         self.rng = np.random.default_rng(seed)
         self.source_distribution = np.ones(n) / n
         self.target_distribution = np.ones(m) / m
         self.cost_matrix = self.rng.uniform(0, 1, (n, m))
-        self.description = f"Synthetic1.n={n}.m={m}"
+        self.description = f"Synthetic I (n={n}, m={m}, reg={reg})"
     
 class Synthetic2OT(BaseOT):
 
@@ -308,6 +311,7 @@ class Synthetic2OT(BaseOT):
         self,
         n: int = 100,
         m: int = 100,
+        reg: float = 0.01,
     ) -> None:
         x1 = 5 * np.arange(n) / (n - 1)
         x2 = 5 * np.arange(m) / (m - 1)
@@ -317,4 +321,5 @@ class Synthetic2OT(BaseOT):
         self.target_distribution = target_density(x2) / np.sum(target_density(x2))
         self.cost_matrix = np.square(x1.reshape(n, 1) - x2.reshape(1, m))
         self.cost_matrix = self.cost_matrix / np.max(self.cost_matrix)
-        self.description = f"Synthetic2.n={n}.m={m}"
+        self.reg = reg
+        self.description = f"Synthetic II (n={n}, m={m}, reg={reg})"
