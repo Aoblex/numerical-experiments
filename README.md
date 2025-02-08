@@ -11,7 +11,7 @@ Create a new environment `num`, install dependencies
 conda create -n num python=3.13
 conda activate num
 conda install pip
-pip install scikit-learn scipy tqdm numpy seaborn
+pip install scikit-learn scipy tqdm numpy seaborn ipykernel
 pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
 ```
 
@@ -21,7 +21,7 @@ pip install torch torchvision torchaudio --index-url https://download.pytorch.or
 conda activate num
 git clone --depth=1 https://github.com/yixuan/regot-python.git 
 cd regot-python
-python setup.py install
+pip install . -r requirements.txt
 ```
 
 ## Running the Experiments
