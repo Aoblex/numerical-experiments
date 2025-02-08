@@ -99,7 +99,7 @@ class OTtask:
             print(f"Results loaded from {results_filepath}")
         else:
             # run the solvers
-            for solver in tqdm(self.solvers, desc='Solvers'):
+            for solver in tqdm(self.solvers, desc='Solving the OT problems'):
                 results['problem_solutions'].append(solver.solve(self.problem))
             if save_results:
                 with open(results_filepath, 'wb') as f:
