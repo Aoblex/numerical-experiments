@@ -67,6 +67,7 @@ class MnistOT(BaseOT):
         self.target_distribution = self._get_distribution(target_idx)
         self.cost_matrix = self._get_cost_matrix(distance)
         self.description = f"MNIST(ID1={source_idx}, ID2={target_idx})[norm={distance}, reg={reg}]"
+        self.title = f"MNIST(ID1={source_idx}, ID2={target_idx})"
     
     def _get_distribution(self, idx: int, eps: float = 0.001) -> np.ndarray:
         """Get the smoothed source/target distribution"""
@@ -117,6 +118,7 @@ class FashionMnistOT(BaseOT):
         self.target_distribution = self._get_distribution(target_idx)
         self.cost_matrix = self._get_cost_matrix(distance)
         self.description = f"FashionMNIST(ID1={source_idx}, ID2={target_idx})[norm={distance}, reg={reg}]"
+        self.title = f"FashionMNIST(ID1={source_idx}, ID2={target_idx})"
     
     def _get_distribution(self, idx: int, eps: float = 0.001) -> np.ndarray:
         """Get the smoothed source/target distribution"""
@@ -195,8 +197,9 @@ class ImagenetteOT(BaseOT):
         self.source_distribution = self._get_distribution(source_classname)
         self.target_distribution = self._get_distribution(target_classname)
         self.cost_matrix = self._get_cost_matrix(source_classname, target_classname, distance)
-        # self.description = f"Imagenette_{source_classname}_{target_classname}_dim={dim}_norm={distance}_reg={reg}"
-        self.description = f"Imagenette({source_classname} vs {target_classname})[norm={distance}, reg={reg}, dim={dim}]"
+        self.description = f"Imagenette_{source_classname}_{target_classname}_dim={dim}_norm={distance}_reg={reg}"
+        capitalize = lambda s: s[0].upper() + s[1:] if len(s) > 0 else s
+        self.title = f"ImageNet({capitalize(source_classname)} vs {capitalize(target_classname)}, eta={reg})"
 
     def _get_classname(self, idx: int):
         """Get the classname: select the first name"""
@@ -304,6 +307,7 @@ class Synthetic1OT(BaseOT):
         self.target_distribution = np.ones(m) / m
         self.cost_matrix = self.rng.uniform(0, 1, (n, m))
         self.description = f"Synthetic I (n={n}, m={m}, reg={reg})"
+        self.title = f"Synthetic I (n=m={n})"
     
 class Synthetic2OT(BaseOT):
 
@@ -323,3 +327,4 @@ class Synthetic2OT(BaseOT):
         self.cost_matrix = self.cost_matrix / np.max(self.cost_matrix)
         self.reg = reg
         self.description = f"Synthetic II (n={n}, m={m}, reg={reg})"
+        self.title = f"Synthetic II (n=m={n})"

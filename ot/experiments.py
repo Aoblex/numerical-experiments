@@ -110,9 +110,9 @@ class OTtask:
     def plot_for_problem(
         self,
         x_key: str = 'iterations',
-        x_label: str = 'Iterations',
+        x_label: str = 'Iteration Number',
         y_key: str = 'log10_mar_errs',
-        y_label: str = 'log10(marginals error)',
+        y_label: str = 'Log10 Gradient Norm',
         force_rerun: bool = True,
         selected_methods: List[str] = None,
     ) -> None:
@@ -144,7 +144,8 @@ class OTtask:
         #     pass
 
         # title
-        title = "\n".join(self.problem.description.split('[')).split(']')[0]
+        # title = "\n".join(self.problem.description.split('[')).split(']')[0]
+        title = self.problem.title
         plt.title(title)
         # labels
         plt.xlabel(x_label)
