@@ -34,7 +34,11 @@ force_rerun = args.force_rerun
 for reg in reg_list:
     for norm in norm_list:
         # Solving the MNIST OT problem
-        fashion_mnist_ot_problem = FashionMnistOT(reg=reg, distance=norm)
+        fashion_mnist_ot_problem = FashionMnistOT(
+            source_idx=source_idx,
+            target_idx=target_idx, 
+            reg=reg, distance=norm
+        )
         fashion_mnist_solvers = get_solvers(reg=reg, max_iter=max_iter, tol=tol,
                                             selected=fashion_mnist_methods)
         fashion_mnist_task = OTtask(problem=fashion_mnist_ot_problem, solvers=fashion_mnist_solvers)
