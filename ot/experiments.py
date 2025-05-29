@@ -134,13 +134,15 @@ class OTtask:
         })
         
         plt.figure(figsize=(10, 6))
+
         # set the x-axis limits
-        if x_key == 'iterations':
-            plt.xlim(0, 300)
-        elif x_key == 'run_times':
-            plt.xlim(0, 3)
-        else:
-            pass
+        # if x_key == 'iterations':
+        #     plt.xlim(0, 300)
+        # elif x_key == 'run_times':
+        #     plt.xlim(0, 3)
+        # else:
+        #     pass
+
         # title
         title = "\n".join(self.problem.description.split('[')).split(']')[0]
         plt.title(title)
