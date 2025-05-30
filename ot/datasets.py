@@ -238,7 +238,6 @@ class ImagenetteOT(BaseOT):
         # save the vectors in a dictionary
         save_path = os.path.join(self.root, f'imagenette2-{self.dim}.pkl')
         if os.path.exists(save_path):
-            print(f"Processed Imagenette dataset found at {save_path}")
             return
 
         input_dict = {}

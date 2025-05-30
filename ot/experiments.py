@@ -5,10 +5,13 @@ import pickle
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+import logging
+from datetime import datetime
 
 SAVE = 'save'
 RESULTS = 'results'
 PLOTS = 'plots'
+LOGS = 'logs'
 
 # set the plot configurations
 sns.set_theme(style="whitegrid")
@@ -22,6 +25,31 @@ plt.rcParams.update({
     'ytick.labelsize': 20,
     # 'savefig.format': 'pdf', # https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.savefig.html
 })
+
+def setup_logging(log_file=None):
+    """Configure logging to output to both file and console"""
+    log_dir = os.path.join(SAVE, LOGS)
+    if not os.path.exists(log_dir):
+        os.makedirs(log_dir)
+    
+    if log_file is None:
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        log_file = os.path.join(log_dir, f"ot_experiments_{timestamp}.log")
+    
+    # Configure logging to output to both file and console
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s - %(levelname)s - %(message)s',
+        handlers=[
+            logging.FileHandler(log_file),
+            logging.StreamHandler()
+        ]
+    )
+    
+    return logging.getLogger()
+
+# Create logger
+logger = setup_logging()
 
 class OTsolver:
 
@@ -79,23 +107,32 @@ class OTtask:
             ...
         }
         """
+        logger.info(f"Current problem: {self.problem.description}")
         problem_results_path = os.path.join(self.results_path, self.problem.description)
         if not os.path.exists(problem_results_path):
             os.makedirs(problem_results_path)
 
         results = {}
         for solver in self.solvers:
-            print(f"Running {solver.method_name} for {self.problem.description}...")
+            logger.info(f"Current method: '{solver.method_name}'")
             results_path = os.path.join(problem_results_path, f"{solver.method_name}.pkl")
             if os.path.exists(results_path) and not force_rerun:
+                logger.info(f"Cached results found at: {results_path}")
                 with open(results_path, 'rb') as f:
                     results[solver.method_name] = pickle.load(f)
                 continue
+            
+            logger.info(f"{solver.method_name} is running...")
             results[solver.method_name] = solver.solve(self.problem)
+            logger.info(f"{solver.method_name} iterations: {len(results[solver.method_name]['iterations'])}")
+            logger.info(f"{solver.method_name} run time: {results[solver.method_name]['run_times'][-1]} seconds")
+            
             if save_results:
                 with open(results_path, 'wb') as f:
                     pickle.dump(results[solver.method_name], f)
+                logger.info(f"Results saved to: {results_path}")
         
+        logger.info(f"Task completed for problem: {self.problem.description}")
         return results
 
     
@@ -108,6 +145,8 @@ class OTtask:
         force_rerun: bool = True,
     ) -> None:
         """Plot a single plot of a single problem with multiple methods"""
+        
+        logger.info(f"{y_key} vs {x_key} plot for problem: {self.problem.description}")
         
         if not os.path.exists(self.plots_path):
             os.makedirs(self.plots_path)
@@ -139,4 +178,4 @@ class OTtask:
                                    f"({x_key}){self.problem.description}.pdf")
         plt.savefig(savefig_path, bbox_inches='tight')
         plt.close()
-        print(f"Plot saved to {savefig_path}")
+        logger.info(f"Plot saved to: {savefig_path}")
