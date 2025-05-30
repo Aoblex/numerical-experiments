@@ -4,12 +4,14 @@ import os
 import pickle
 import numpy as np
 import matplotlib.pyplot as plt
+import seaborn as sns
 from tqdm import tqdm
 
 SAVE = 'save'
 RESULTS = 'results'
 PLOTS = 'plots'
 
+sns.set_theme(style="whitegrid")
 class OTsolver:
 
     # specifying colors: https://matplotlib.org/stable/users/explain/colors/colors.html
