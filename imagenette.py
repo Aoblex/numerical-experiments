@@ -57,7 +57,11 @@ for reg in reg_list:
             imagenette_solvers = get_solvers(reg=reg, max_iter=max_iter, tol=tol,
                                             selected=imagenette_methods)
             imagenette_task = OTtask(problem=imagenette_ot_problem, solvers=imagenette_solvers)
-            imagenette_task.plot_for_problem(x_key='iterations', x_label='Iteration Number', y_label='Log10 Gradient Norm',
-                                            force_rerun=force_rerun, selected_methods=imagenette_methods)
-            imagenette_task.plot_for_problem(x_key='run_times', x_label='Run time(seconds)', y_label='Log10 Gradient Norm',
-                                            force_rerun=force_rerun, selected_methods=imagenette_methods)
+            imagenette_task.plot_for_problem(x_key='iterations',
+                                             x_label='Iteration Number',
+                                             y_label='Log10 Gradient Norm',
+                                             force_rerun=force_rerun)
+            imagenette_task.plot_for_problem(x_key='run_times',
+                                             x_label='Run time(seconds)',
+                                             y_label='Log10 Gradient Norm',
+                                             force_rerun=force_rerun)

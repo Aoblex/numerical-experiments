@@ -48,7 +48,11 @@ for reg in reg_list:
             mnist_solvers = get_solvers(reg=reg, max_iter=max_iter, tol=tol,
                                         selected=mnist_methods)
             mnist_task = OTtask(problem=mnist_ot_problem, solvers=mnist_solvers)
-            mnist_task.plot_for_problem(x_key='iterations', x_label='Iteration Number', y_label='Log10 Gradient Norm',
-                                        force_rerun=force_rerun, selected_methods=mnist_methods)
-            mnist_task.plot_for_problem(x_key='run_times', x_label='Run time(seconds)', y_label='Log10 Gradient Norm',
-                                        force_rerun=force_rerun, selected_methods=mnist_methods)
+            mnist_task.plot_for_problem(x_key='iterations',
+                                        x_label='Iteration Number',
+                                        y_label='Log10 Gradient Norm',
+                                        force_rerun=force_rerun)
+            mnist_task.plot_for_problem(x_key='run_times',
+                                        x_label='Run time(seconds)',
+                                        y_label='Log10 Gradient Norm',
+                                        force_rerun=force_rerun)

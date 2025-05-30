@@ -37,7 +37,11 @@ for reg in reg_list:
         synthetic1_solvers = get_solvers(reg=reg, max_iter=max_iter, tol=tol,
                                          selected=synthetic1_methods)
         synthetic1_task = OTtask(problem=synthetic1_ot_problem, solvers=synthetic1_solvers)
-        synthetic1_task.plot_for_problem(x_key='iterations', x_label='Iteration Number', y_label='Log10 Gradient Norm',
-                                         force_rerun=force_rerun, selected_methods=synthetic1_methods)
-        synthetic1_task.plot_for_problem(x_key='run_times', x_label='Run time(seconds)', y_label='Log10 Gradient Norm',
-                                         force_rerun=force_rerun, selected_methods=synthetic1_methods)
+        synthetic1_task.plot_for_problem(x_key='iterations',
+                                         x_label='Iteration Number',
+                                         y_label='Log10 Gradient Norm',
+                                         force_rerun=force_rerun)
+        synthetic1_task.plot_for_problem(x_key='run_times',
+                                         x_label='Run time(seconds)',
+                                         y_label='Log10 Gradient Norm',
+                                         force_rerun=force_rerun)

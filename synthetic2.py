@@ -40,7 +40,11 @@ for reg in reg_list:
         synthetic2_task = OTtask(problem=synthetic2_ot_problem, solvers=synthetic2_solvers)
         
         print(f"Running Synthetic2 experiment with size {problem_size}, reg {reg}")
-        synthetic2_task.plot_for_problem(x_key='iterations', x_label='Iteration Number', y_label='Log10 Gradient Norm',
-                                         force_rerun=force_rerun, selected_methods=synthetic2_methods)
-        synthetic2_task.plot_for_problem(x_key='run_times', x_label='Run time(seconds)', y_label='Log10 Gradient Norm',
-                                         force_rerun=force_rerun, selected_methods=synthetic2_methods)
+        synthetic2_task.plot_for_problem(x_key='iterations',
+                                         x_label='Iteration Number',
+                                         y_label='Log10 Gradient Norm',
+                                         force_rerun=force_rerun)
+        synthetic2_task.plot_for_problem(x_key='run_times',
+                                         x_label='Run time(seconds)',
+                                         y_label='Log10 Gradient Norm',
+                                         force_rerun=force_rerun)
