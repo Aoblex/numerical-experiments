@@ -72,14 +72,12 @@ python imagenette.py \
 python synthetic1.py \
     --reg 0.001 \
     --size 1000 5000 10000 \
-    --methods SPLR 'Sparse Newton' \
-    --force-rerun
+    --methods SPLR 'Sparse Newton'
 
 python synthetic2.py \
     --reg 0.001 \
     --size 1000 5000 10000 \
-    --methods SPLR 'Sparse Newton' \
-    --force-rerun
+    --methods SPLR 'Sparse Newton'
 
 ####################################
 # Extra test examples (eta = 0.01) #
@@ -130,3 +128,13 @@ python imagenette.py \
     --source 'tench'           'tench'  'tench'         'tench' \
     --target 'cassette player' 'church' 'garbage truck' 'golf ball' \
     --methods BCD APDAGD LBFGS-Dual Newton SSNS SPLR
+
+################################
+# Eigenvalue of Sparse Hessian #
+################################
+
+python sparse_eigen.py \
+    --n 1000 \
+    --m 1000 \
+    --stride 1000 \
+    --repeat 3
