@@ -10,10 +10,10 @@ parser.add_argument('--reg', nargs='+', type=float, default=[0.001],
 parser.add_argument('--norm', nargs='+', type=str, default=['l1'],
                     choices=['l1', 'l2'], 
                     help='List of distance norms to use (default: [l1])')
-parser.add_argument('--source', type=int, default=2,
-                    help='Source MNIST index (default: 2)')
-parser.add_argument('--target', type=int, default=54698,
-                    help='Target MNIST index (default: 54698)')
+parser.add_argument('--source', nargs='+', type=int, default=[2],
+                    help='Source MNIST index (default: [2])')
+parser.add_argument('--target', nargs='+', type=int, default=[54698],
+                    help='Target MNIST index (default: [54698])')
 parser.add_argument('--max-iter', type=int, default=500,
                     help='Maximum number of iterations (default: 500)')
 parser.add_argument('--tol', type=float, default=1e-6,
@@ -28,8 +28,7 @@ args = parser.parse_args()
 reg_list = args.reg
 norm_list = args.norm
 max_iter, tol = args.max_iter, args.tol
-source_idx = args.source
-target_idx = args.target
+idx_pairs = list(zip(args.source, args.target))
 mnist_methods = args.methods if args.methods else [
     'BCD', 'APDAGD', # first-order methods
     'LBFGS-Dual', 'Newton', # second-order methods
@@ -40,15 +39,16 @@ force_rerun = args.force_rerun
 
 for reg in reg_list:
     for norm in norm_list:
-        # Solving the MNIST OT problem
-        mnist_ot_problem = MnistOT(
-            source_idx=source_idx, target_idx=target_idx,
-            reg=reg, distance=norm
-        )
-        mnist_solvers = get_solvers(reg=reg, max_iter=max_iter, tol=tol,
-                                    selected=mnist_methods)
-        mnist_task = OTtask(problem=mnist_ot_problem, solvers=mnist_solvers)
-        mnist_task.plot_for_problem(x_key='iterations', x_label='Iteration Number', y_label='Log10 Gradient Norm',
-                                    force_rerun=force_rerun, selected_methods=mnist_methods)
-        mnist_task.plot_for_problem(x_key='run_times', x_label='Run time(seconds)', y_label='Log10 Gradient Norm',
-                                    force_rerun=force_rerun, selected_methods=mnist_methods)
+        for source_idx, target_idx in idx_pairs:
+            # Solving the MNIST OT problem
+            mnist_ot_problem = MnistOT(
+                source_idx=source_idx, target_idx=target_idx,
+                reg=reg, distance=norm
+            )
+            mnist_solvers = get_solvers(reg=reg, max_iter=max_iter, tol=tol,
+                                        selected=mnist_methods)
+            mnist_task = OTtask(problem=mnist_ot_problem, solvers=mnist_solvers)
+            mnist_task.plot_for_problem(x_key='iterations', x_label='Iteration Number', y_label='Log10 Gradient Norm',
+                                        force_rerun=force_rerun, selected_methods=mnist_methods)
+            mnist_task.plot_for_problem(x_key='run_times', x_label='Run time(seconds)', y_label='Log10 Gradient Norm',
+                                        force_rerun=force_rerun, selected_methods=mnist_methods)

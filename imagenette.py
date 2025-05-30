@@ -10,13 +10,13 @@ parser.add_argument('--reg', nargs='+', type=float, default=[0.001],
 parser.add_argument('--norm', nargs='+', type=str, default=['l1'],
                     choices=['l1', 'l2'], 
                     help='List of distance norms to use (default: [l1])')
-parser.add_argument('--source', type=str, default='tench',
-                    help='Source Imagenette class (default: tench)',
+parser.add_argument('--source', nargs='+', type=str, default=['tench'],
+                    help='Source Imagenette class (default: [\'tench\'])',
                     choices=['tench', 'English springer', 'cassette player', 
                              'chain saw', 'church', 'French horn', 'garbage truck', 
                              'gas pump', 'golf ball', 'parachute'])
-parser.add_argument('--target', type=str, default='cassette player',
-                    help='Target Imagenette class(default: cassette player)',
+parser.add_argument('--target', nargs='+', type=str, default=['cassette player'],
+                    help='Target Imagenette class(default: [\'cassette player\'])',
                     choices=['tench', 'English springer', 'cassette player', 
                              'chain saw', 'church', 'French horn', 'garbage truck', 
                              'gas pump', 'golf ball', 'parachute'])
@@ -34,8 +34,9 @@ args = parser.parse_args()
 reg_list = args.reg
 norm_list = args.norm
 max_iter, tol = args.max_iter, args.tol
-source_class = args.source
-target_class = args.target
+source_classes = args.source
+target_classes = args.target
+class_pairs = list(zip(source_classes, target_classes))
 imagenette_methods = args.methods if args.methods else [
     'BCD', 'APDAGD', # first-order methods
     'LBFGS-Dual', 'Newton', # second-order methods
@@ -46,16 +47,17 @@ force_rerun = args.force_rerun
 
 for reg in reg_list:
     for norm in norm_list:
-        # Solving the Imagenette OT problem
-        imagenette_ot_problem = ImagenetteOT(
-            source_classname=source_class,
-            target_classname=target_class,
-            reg=reg, distance=norm
-        )
-        imagenette_solvers = get_solvers(reg=reg, max_iter=max_iter, tol=tol,
-                                         selected=imagenette_methods)
-        imagenette_task = OTtask(problem=imagenette_ot_problem, solvers=imagenette_solvers)
-        imagenette_task.plot_for_problem(x_key='iterations', x_label='Iteration Number', y_label='Log10 Gradient Norm',
-                                         force_rerun=force_rerun, selected_methods=imagenette_methods)
-        imagenette_task.plot_for_problem(x_key='run_times', x_label='Run time(seconds)', y_label='Log10 Gradient Norm',
-                                         force_rerun=force_rerun, selected_methods=imagenette_methods)
+        for source_class, target_class in class_pairs:
+            # Solving the Imagenette OT problem
+            imagenette_ot_problem = ImagenetteOT(
+                source_classname=source_class,
+                target_classname=target_class,
+                reg=reg, distance=norm
+            )
+            imagenette_solvers = get_solvers(reg=reg, max_iter=max_iter, tol=tol,
+                                            selected=imagenette_methods)
+            imagenette_task = OTtask(problem=imagenette_ot_problem, solvers=imagenette_solvers)
+            imagenette_task.plot_for_problem(x_key='iterations', x_label='Iteration Number', y_label='Log10 Gradient Norm',
+                                            force_rerun=force_rerun, selected_methods=imagenette_methods)
+            imagenette_task.plot_for_problem(x_key='run_times', x_label='Run time(seconds)', y_label='Log10 Gradient Norm',
+                                            force_rerun=force_rerun, selected_methods=imagenette_methods)
