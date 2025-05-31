@@ -1,39 +1,5 @@
 #!/bin/bash
 
-####################
-# synthetic data I #
-####################
-
-python synthetic1.py \
-    --task-name 'Synthetic I' \
-    --reg 0.001 \
-    --size 1000 \
-    --methods BCD APDAGD LBFGS-Dual Newton SSNS SPLR
-
-python synthetic1.py \
-    --task-name 'Synthetic I' \
-    --reg 0.001 \
-    --size 5000 10000 \
-    --methods BCD LBFGS-Dual SSNS SPLR
-
-
-#####################
-# synthetic data II #
-#####################
-
-python synthetic2.py \
-    --task-name 'Synthetic II' \
-    --reg 0.001 \
-    --size 1000 \
-    --methods BCD APDAGD LBFGS-Dual Newton SSNS SPLR
-
-python synthetic2.py \
-    --task-name 'Synthetic II' \
-    --reg 0.001 \
-    --size 5000 10000 \
-    --methods BCD LBFGS-Dual SSNS SPLR
-
-
 #########
 # MNIST #
 #########
@@ -71,6 +37,37 @@ python imagenette.py \
     --target 'cassette player' \
     --methods BCD APDAGD LBFGS-Dual Newton SSNS SPLR
 
+####################
+# synthetic data I #
+####################
+
+python synthetic1.py \
+    --task-name 'Synthetic I' \
+    --reg 0.001 \
+    --size 1000 \
+    --methods BCD APDAGD LBFGS-Dual Newton SSNS SPLR
+
+python synthetic1.py \
+    --task-name 'Synthetic I' \
+    --reg 0.001 \
+    --size 5000 10000 \
+    --methods BCD LBFGS-Dual SSNS SPLR
+
+#####################
+# synthetic data II #
+#####################
+
+python synthetic2.py \
+    --task-name 'Synthetic II' \
+    --reg 0.001 \
+    --size 1000 \
+    --methods BCD APDAGD LBFGS-Dual Newton SSNS SPLR
+
+python synthetic2.py \
+    --task-name 'Synthetic II' \
+    --reg 0.001 \
+    --size 5000 10000 \
+    --methods BCD LBFGS-Dual SSNS SPLR
 
 ##################
 # Ablation study #
@@ -91,32 +88,6 @@ python synthetic2.py \
 ####################################
 # Extra test examples (eta = 0.01) #
 ####################################
-
-# synthetic data I
-python synthetic1.py \
-    --task-name 'Synthetic I - Extra' \
-    --reg 0.01 \
-    --size 1000 \
-    --methods BCD APDAGD LBFGS-Dual Newton SSNS SPLR
-
-python synthetic1.py \
-    --task-name 'Synthetic I - Extra' \
-    --reg 0.01 \
-    --size 5000 10000 \
-    --methods BCD LBFGS-Dual SSNS SPLR
-
-# synthetic data II
-python synthetic2.py \
-    --task-name 'Synthetic II - Extra' \
-    --reg 0.01 \
-    --size 1000 \
-    --methods BCD APDAGD LBFGS-Dual Newton SSNS SPLR
-
-python synthetic2.py \
-    --task-name 'Synthetic II - Extra' \
-    --reg 0.01 \
-    --size 5000 10000 \
-    --methods BCD LBFGS-Dual SSNS SPLR
 
 # MNIST
 python mnist.py \
@@ -144,6 +115,32 @@ python imagenette.py \
     --source 'tench'           'tench'  'tench'         'tench' \
     --target 'cassette player' 'church' 'garbage truck' 'golf ball' \
     --methods BCD APDAGD LBFGS-Dual Newton SSNS SPLR
+
+# synthetic data I
+python synthetic1.py \
+    --task-name 'Synthetic I - Extra' \
+    --reg 0.01 \
+    --size 1000 \
+    --methods BCD APDAGD LBFGS-Dual Newton SSNS SPLR
+
+python synthetic1.py \
+    --task-name 'Synthetic I - Extra' \
+    --reg 0.01 \
+    --size 5000 10000 \
+    --methods BCD LBFGS-Dual SSNS SPLR
+
+# synthetic data II
+python synthetic2.py \
+    --task-name 'Synthetic II - Extra' \
+    --reg 0.01 \
+    --size 1000 \
+    --methods BCD APDAGD LBFGS-Dual Newton SSNS SPLR
+
+python synthetic2.py \
+    --task-name 'Synthetic II - Extra' \
+    --reg 0.01 \
+    --size 5000 10000 \
+    --methods BCD LBFGS-Dual SSNS SPLR
 
 ################################
 # Eigenvalue of Sparse Hessian #
