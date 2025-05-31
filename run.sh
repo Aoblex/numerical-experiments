@@ -134,7 +134,7 @@ python imagenette.py \
 ################################
 
 python sparse_eigen.py \
-    --n 1000 \
-    --m 1000 \
-    --stride 1000 \
-    --repeat 3
+    --n 100 \
+    --m 100 \
+    --stride 50 \
+    --repeat 10 
