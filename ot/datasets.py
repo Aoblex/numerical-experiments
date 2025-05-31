@@ -22,6 +22,7 @@ class BaseOT:
         self.target_distribution = None
         self.cost_matrix = None
         self.description = None
+        self.data_name = None
 
     @abstractmethod
     def _get_distribution(self, *args, **kwargs) -> np.ndarray:
@@ -65,8 +66,9 @@ class MnistOT(BaseOT):
         self.source_distribution = self._get_distribution(source_idx)
         self.target_distribution = self._get_distribution(target_idx)
         self.cost_matrix = self._get_cost_matrix(distance)
-        self.description = f"MNIST(ID1={source_idx}, ID2={target_idx})[norm={distance}, reg={reg}]"
+        self.description = f"ID1={source_idx}, ID2={target_idx}, norm={distance}, reg={reg}"
         self.title = f"MNIST(ID1={source_idx}, ID2={target_idx})"
+        self.data_name = "MNIST"
     
     def _get_distribution(self, idx: int, eps: float = 0.001) -> np.ndarray:
         """Get the smoothed source/target distribution"""
@@ -116,8 +118,9 @@ class FashionMnistOT(BaseOT):
         self.source_distribution = self._get_distribution(source_idx)
         self.target_distribution = self._get_distribution(target_idx)
         self.cost_matrix = self._get_cost_matrix(distance)
-        self.description = f"FashionMNIST(ID1={source_idx}, ID2={target_idx})[norm={distance}, reg={reg}]"
+        self.description = f"ID1={source_idx}, ID2={target_idx}, norm={distance}, reg={reg}"
         self.title = f"FashionMNIST(ID1={source_idx}, ID2={target_idx})"
+        self.data_name = "FashionMNIST"
     
     def _get_distribution(self, idx: int, eps: float = 0.001) -> np.ndarray:
         """Get the smoothed source/target distribution"""
@@ -196,9 +199,10 @@ class ImagenetteOT(BaseOT):
         self.source_distribution = self._get_distribution(source_classname)
         self.target_distribution = self._get_distribution(target_classname)
         self.cost_matrix = self._get_cost_matrix(source_classname, target_classname, distance)
-        self.description = f"Imagenette_{source_classname}_{target_classname}_dim={dim}_norm={distance}_reg={reg}"
+        self.description = f"CLASS1={source_classname}, CLASS2={target_classname}, dim={dim}, norm={distance}, reg={reg}"
         capitalize = lambda s: s[0].upper() + s[1:] if len(s) > 0 else s
         self.title = f"ImageNet({capitalize(source_classname)} vs {capitalize(target_classname)}, eta={reg})"
+        self.data_name = "Imagenette"
 
     def _get_classname(self, idx: int):
         """Get the classname: select the first name"""
@@ -304,8 +308,9 @@ class Synthetic1OT(BaseOT):
         self.source_distribution = np.ones(n) / n
         self.target_distribution = np.ones(m) / m
         self.cost_matrix = self.rng.uniform(0, 1, (n, m))
-        self.description = f"Synthetic I (n={n}, m={m}, reg={reg})"
+        self.description = f"n={n}, m={m}, reg={reg}"
         self.title = f"Synthetic I (n=m={n})"
+        self.data_name = "Synthetic I"
     
 class Synthetic2OT(BaseOT):
 
@@ -324,5 +329,6 @@ class Synthetic2OT(BaseOT):
         self.cost_matrix = np.square(x1.reshape(n, 1) - x2.reshape(1, m))
         self.cost_matrix = self.cost_matrix / np.max(self.cost_matrix)
         self.reg = reg
-        self.description = f"Synthetic II (n={n}, m={m}, reg={reg})"
+        self.description = f"n={n}, m={m}, reg={reg}"
         self.title = f"Synthetic II (n=m={n})"
+        self.data_name = "Synthetic II"

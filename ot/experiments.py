@@ -9,7 +9,7 @@ import logging
 from datetime import datetime
 
 SAVE = 'save'
-RESULTS = 'results'
+PICKLE = 'pickle'
 PLOTS = 'plots'
 LOGS = 'logs'
 
@@ -87,17 +87,17 @@ class OTtask:
         self,
         problem: BaseOT,
         solvers: List[OTsolver],
-        results_path: str = os.path.join(SAVE, RESULTS),
+        pickle_path: str = os.path.join(SAVE, PICKLE),
         plots_path: str = os.path.join(SAVE, PLOTS),
     ):
         self.problem = problem
         self.solvers = solvers
-        self.results_path = results_path
+        self.pickle_path = pickle_path
         self.plots_path = plots_path
     
     def run(
         self,
-        save_results: bool = True,
+        save_pickle: bool = True,
         force_rerun: bool = True,
     ) -> dict:
         """Return a dictionary:
@@ -107,18 +107,23 @@ class OTtask:
             ...
         }
         """
-        logger.info(f"Current problem: {self.problem.description}")
-        problem_results_path = os.path.join(self.results_path, self.problem.description)
-        if not os.path.exists(problem_results_path):
-            os.makedirs(problem_results_path)
+        logger.info(f"Current dataset: {self.problem.data_name}")
+        logger.info(f"Current settings: {self.problem.description}")
+        problem_pickle_path = os.path.join(
+            self.pickle_path,
+            self.problem.data_name,
+            self.problem.description
+        )
+        if not os.path.exists(problem_pickle_path):
+            os.makedirs(problem_pickle_path)
 
         results = {}
         for solver in self.solvers:
             logger.info(f"Current method: '{solver.method_name}'")
-            results_path = os.path.join(problem_results_path, f"{solver.method_name}.pkl")
-            if os.path.exists(results_path) and not force_rerun:
-                logger.info(f"Cached results found at: {results_path}")
-                with open(results_path, 'rb') as f:
+            pickle_path = os.path.join(problem_pickle_path, f"{solver.method_name}.pkl")
+            if os.path.exists(pickle_path) and not force_rerun:
+                logger.info(f"Cached pickle found at: {pickle_path}")
+                with open(pickle_path, 'rb') as f:
                     results[solver.method_name] = pickle.load(f)
                 continue
             
@@ -126,14 +131,14 @@ class OTtask:
             results[solver.method_name] = solver.solve(self.problem)
             logger.info(f"{solver.method_name} iterations: {len(results[solver.method_name]['iterations'])}")
             logger.info(f"{solver.method_name} run time: {results[solver.method_name]['run_times'][-1]} seconds")
-            
-            if save_results:
-                with open(results_path, 'wb') as f:
+
+            if save_pickle:
+                with open(pickle_path, 'wb') as f:
                     pickle.dump(results[solver.method_name], f)
-                logger.info(f"Results saved to: {results_path}")
+                logger.info(f"pickle saved to: {pickle_path}")
         
-        logger.info(f"Task completed for problem: {self.problem.description}")
-        return results
+        logger.info(f"Task completed for {self.problem.data_name}: {self.problem.description}")
+        return results 
 
     
     def plot_for_problem(
@@ -146,7 +151,7 @@ class OTtask:
     ) -> None:
         """Plot a single plot of a single problem with multiple methods"""
         
-        logger.info(f"{y_key} vs {x_key} plot for problem: {self.problem.description}")
+        logger.info(f"{y_key} vs {x_key} plot for {self.problem.data_name}: {self.problem.description}")
         
         if not os.path.exists(self.plots_path):
             os.makedirs(self.plots_path)
@@ -159,7 +164,7 @@ class OTtask:
         plt.grid(True)
 
         # plot the solutions
-        results = self.run(save_results=True, force_rerun=force_rerun)
+        results = self.run(save_pickle=True, force_rerun=force_rerun)
         for method_name, result in results.items():
             # plot the solution
             x = result[x_key]
@@ -175,7 +180,9 @@ class OTtask:
         plt.legend(loc='upper right')
         # save the plot
         savefig_path = os.path.join(self.plots_path,
-                                   f"({x_key}){self.problem.description}.pdf")
+                                    x_key,
+                                   f"{self.problem.description}.pdf")
+        os.makedirs(os.path.dirname(savefig_path), exist_ok=True)
         plt.savefig(savefig_path, bbox_inches='tight')
         plt.close()
         logger.info(f"Plot saved to: {savefig_path}")
