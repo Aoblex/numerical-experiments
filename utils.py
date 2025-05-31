@@ -25,7 +25,7 @@ def get_solvers(reg, max_iter, tol, selected: None | List[str] = None) -> List:
     sinkhorn_sparse_newton = OTsolver(method=regot.sinkhorn_sparse_newton, method_name='Sparse Newton', shift=1e-6,
                                     color='#e6a682', linestyle=(0, (1, 1)),
                                     reg=reg, max_iter=max_iter, tol=tol)
-    sinkhorn_splr = OTsolver(method=regot.sinkhorn_splr, method_name='SPLR', density=0.01, shift=1e-6,
+    sinkhorn_splr = OTsolver(method=regot.sinkhorn_splr, method_name='SPLR', density=0.001, shift=1e-6,
                             color='#4c72b0', linestyle='solid',
                             reg=reg, max_iter=max_iter, tol=tol)
 
