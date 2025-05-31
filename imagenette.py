@@ -5,6 +5,8 @@ from ot.experiments import OTtask
 
 # Parse command line arguments
 parser = argparse.ArgumentParser(description='Run Imagenette OT experiments')
+parser.add_argument('--task-name', type=str, default="ImageNet",
+                    help='Name of current OT task, also the name of plot folder (default: ImageNet)')
 parser.add_argument('--reg', nargs='+', type=float, default=[0.001],
                     help='List of regularization parameters (default: [0.001])')
 parser.add_argument('--norm', nargs='+', type=str, default=['l1'],
@@ -30,7 +32,7 @@ parser.add_argument('--force-rerun', action='store_true',
                     help='Force rerun of the experiments even if results exist')
 args = parser.parse_args()
 
-# Use parsed arguments
+task_name = args.task_name
 reg_list = args.reg
 norm_list = args.norm
 max_iter, tol = args.max_iter, args.tol
@@ -56,7 +58,11 @@ for reg in reg_list:
             )
             imagenette_solvers = get_solvers(reg=reg, max_iter=max_iter, tol=tol,
                                             selected=imagenette_methods)
-            imagenette_task = OTtask(problem=imagenette_ot_problem, solvers=imagenette_solvers)
+            imagenette_task = OTtask(
+                task_name=task_name, 
+                problem=imagenette_ot_problem,
+                solvers=imagenette_solvers,
+            )
             imagenette_task.plot_for_problem(x_key='iterations',
                                              x_label='Iteration Number',
                                              y_label='Log10 Gradient Norm',

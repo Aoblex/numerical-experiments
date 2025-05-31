@@ -87,11 +87,13 @@ class OTtask:
         self,
         problem: BaseOT,
         solvers: List[OTsolver],
+        task_name: str,
         pickle_path: str = os.path.join(SAVE, PICKLE),
         plots_path: str = os.path.join(SAVE, PLOTS),
     ):
         self.problem = problem
         self.solvers = solvers
+        self.task_name = task_name
         self.pickle_path = pickle_path
         self.plots_path = plots_path
     
@@ -180,7 +182,7 @@ class OTtask:
         plt.legend(loc='upper right')
         # save the plot
         savefig_path = os.path.join(self.plots_path,
-                                    self.problem.data_name,
+                                    self.task_name,
                                     x_key,
                                     f"{self.problem.description}.pdf")
         os.makedirs(os.path.dirname(savefig_path), exist_ok=True)
