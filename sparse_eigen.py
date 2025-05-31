@@ -78,55 +78,53 @@ def main(n, m, num_zeros, stride, repeat):
     eigen_path = os.path.join(SAVE, EIGEN)
     if not os.path.exists(eigen_path):
         os.makedirs(eigen_path)
+
+    min_eig_list, max_eig_list, steps_list = zip(*results)
+    min_eig_list = np.array(min_eig_list)
+    max_eig_list = np.array(max_eig_list)
+    log10_condition_number_list = np.log10(max_eig_list / min_eig_list)
+    steps = steps_list[0]  # Assuming all simulations have the same steps
     
-    title = f'Hessian Eigenvalues (n={n}, m={m})'
-    plt.figure(figsize=(10, 6), dpi=300)
-    plt.title(title)
+    min_eig_min = min_eig_list.min(axis=0)
+    min_eig_max = min_eig_list.max(axis=0)
+    min_eig_mean = min_eig_list.mean(axis=0)
+
+    max_eig_min = max_eig_list.min(axis=0)
+    max_eig_max = max_eig_list.max(axis=0)
+    max_eig_mean = max_eig_list.mean(axis=0)
+
+    log10_condition_number_min = log10_condition_number_list.min(axis=0)
+    log10_condition_number_max = log10_condition_number_list.max(axis=0)
+    log10_condition_number_mean = log10_condition_number_list.mean(axis=0)
+
+    plt.figure(num=1, figsize=(10, 6), dpi=300)
+    plt.title(f'Hessian Eigenvalues (n={n}, m={m})')
     plt.xlabel('Sparsification Step')
     plt.ylabel('Eigenvalue')
     plt.grid(True)
-    for i, result in enumerate(results):
-        min_eigenvalues, max_eigenvalues, num_sparsifications = result
-        if i == 0:
-            plt.plot(
-                num_sparsifications,
-                min_eigenvalues,
-                label='Min Eigenvalue',
-                color='blue',
-                linestyle='dashed',
-                linewidth=0.8,
-                alpha=0.4,
-            )
-            plt.plot(
-                num_sparsifications,
-                max_eigenvalues,
-                label='Max Eigenvalue',
-                color='red',
-                linestyle='solid',
-                linewidth=0.8,
-                alpha=0.4,
-            )
-        else :
-            plt.plot(
-                num_sparsifications,
-                min_eigenvalues,
-                color='blue',
-                linestyle='dashed',
-                linewidth=0.8,
-                alpha=0.4,
-            )
-            plt.plot(
-                num_sparsifications,
-                max_eigenvalues,
-                color='red',
-                linestyle='solid',
-                linewidth=0.8,
-                alpha=0.4,
-            )
+    plt.plot(steps, min_eig_mean, color='blue', linestyle='dashed', linewidth=0.8, label='Min Eigenvalue')
+    plt.fill_between(steps, min_eig_min, min_eig_max,     
+                     color='blue', alpha=0.2)
+    plt.plot(steps, max_eig_mean, color='red', linestyle='solid', linewidth=0.8, label='Max Eigenvalue')
+    plt.fill_between(steps, max_eig_min, max_eig_max,
+                     color='red', alpha=0.2)
     plt.legend(loc='upper right')
-    savefig_path = os.path.join(eigen_path, f'eigenvalues_n{n}_m{m}.png')
     plt.tight_layout()
-    plt.savefig(savefig_path)
+    plt.savefig(os.path.join(eigen_path, f'eigenvalues_n{n}_m{m}.png'))
+
+    plt.figure(num=2, figsize=(10, 6), dpi=300)
+    plt.title(f'Hessian Condition Number (n={n}, m={m})')
+    plt.xlabel('Sparsification Step')
+    plt.ylabel('Log10 Condition Number')
+    plt.grid(True)
+    plt.plot(steps, log10_condition_number_mean, color='green', linestyle='solid', linewidth=0.8,
+             label='Log10 Condition Number')
+    plt.fill_between(steps, log10_condition_number_min, log10_condition_number_max,
+                     color='green', alpha=0.2)
+    plt.legend(loc='upper right')
+    plt.tight_layout()
+    plt.savefig(os.path.join(eigen_path, f'condition_number_n{n}_m{m}.png'))
+
     plt.close()
 
 
