@@ -8,7 +8,6 @@ import torch
 import torchvision.models as models
 from torchvision.models.resnet import ResNet18_Weights
 from sklearn.decomposition import PCA
-from .objectives import SinkhornOT
 from scipy.stats import expon, norm
 from abc import abstractmethod
 
