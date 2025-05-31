@@ -70,11 +70,13 @@ python imagenette.py \
 ##################
 
 python synthetic1.py \
+    --task-name 'Synthetic I - Ablation' \
     --reg 0.001 \
     --size 1000 5000 10000 \
     --methods SPLR 'Sparse Newton'
 
 python synthetic2.py \
+    --task-name 'Synthetic II - Ablation' \
     --reg 0.001 \
     --size 1000 5000 10000 \
     --methods SPLR 'Sparse Newton'
