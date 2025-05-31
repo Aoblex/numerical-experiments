@@ -180,8 +180,9 @@ class OTtask:
         plt.legend(loc='upper right')
         # save the plot
         savefig_path = os.path.join(self.plots_path,
+                                    self.problem.data_name,
                                     x_key,
-                                   f"{self.problem.description}.pdf")
+                                    f"{self.problem.description}.pdf")
         os.makedirs(os.path.dirname(savefig_path), exist_ok=True)
         plt.savefig(savefig_path, bbox_inches='tight')
         plt.close()
