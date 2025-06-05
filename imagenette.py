@@ -28,6 +28,8 @@ parser.add_argument('--tol', type=float, default=1e-6,
                     help='Tolerance for convergence (default: 1e-6)')
 parser.add_argument('--methods', nargs='+', type=str, default=None,
                     help='List of methods to use, separated by space(default: suitable methods)')
+parser.add_argument('--save-matrices', action='store_true',
+                    help='Whether to save the (M, a, b) matrices of the problem')
 parser.add_argument('--force-rerun', action='store_true',
                     help='Force rerun of the experiments even if results exist')
 args = parser.parse_args()
@@ -45,6 +47,7 @@ imagenette_methods = args.methods if args.methods else [
     'SSNS', # sparse method
     'SPLR' # new methods
 ]
+save_matrices = args.save_matrices
 force_rerun = args.force_rerun
 
 for reg in reg_list:
@@ -66,8 +69,10 @@ for reg in reg_list:
             imagenette_task.plot_for_problem(x_key='iterations',
                                              x_label='Iteration Number',
                                              y_label='Log10 Gradient Norm',
-                                             force_rerun=force_rerun)
+                                             force_rerun=force_rerun,
+                                             save_matrices=save_matrices)
             imagenette_task.plot_for_problem(x_key='run_times',
                                              x_label='Run time(seconds)',
                                              y_label='Log10 Gradient Norm',
-                                             force_rerun=force_rerun)
+                                             force_rerun=force_rerun,
+                                             save_matrices=save_matrices)

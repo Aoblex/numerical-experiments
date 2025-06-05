@@ -35,7 +35,8 @@ python imagenette.py \
     --norm l1 \
     --source 'tench' \
     --target 'cassette player' \
-    --methods BCD APDAGD LBFGS-Dual Newton SSNS SPLR
+    --methods BCD APDAGD LBFGS-Dual Newton SSNS SPLR \
+    --save-matrices
 
 ####################
 # synthetic data I #
@@ -114,7 +115,8 @@ python imagenette.py \
     --norm l1 l2 \
     --source 'tench'           'tench'  'tench'         'tench' \
     --target 'cassette player' 'church' 'garbage truck' 'golf ball' \
-    --methods BCD APDAGD LBFGS-Dual Newton SSNS SPLR
+    --methods BCD APDAGD LBFGS-Dual Newton SSNS SPLR \
+    --save-matrices
 
 # synthetic data I
 python synthetic1.py \
