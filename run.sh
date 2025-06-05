@@ -46,13 +46,22 @@ python synthetic1.py \
     --task-name 'Synthetic I' \
     --reg 0.001 \
     --size 1000 \
+    --max-iter 100 \
     --methods BCD APDAGD LBFGS-Dual Newton SSNS SPLR
 
 python synthetic1.py \
     --task-name 'Synthetic I' \
     --reg 0.001 \
-    --size 5000 10000 \
-    --methods BCD LBFGS-Dual SSNS SPLR
+    --size 5000 \
+    --methods BCD LBFGS-Dual SSNS SPLR \
+    --plot-xlim 15
+
+python synthetic1.py \
+    --task-name 'Synthetic I' \
+    --reg 0.001 \
+    --size 10000 \
+    --methods BCD LBFGS-Dual SSNS SPLR \
+    --plot-xlim 30
 
 #####################
 # synthetic data II #
@@ -123,13 +132,22 @@ python synthetic1.py \
     --task-name 'Synthetic I - Extra' \
     --reg 0.01 \
     --size 1000 \
+    --max-iter 100 \
     --methods BCD APDAGD LBFGS-Dual Newton SSNS SPLR
 
 python synthetic1.py \
     --task-name 'Synthetic I - Extra' \
     --reg 0.01 \
-    --size 5000 10000 \
-    --methods BCD LBFGS-Dual SSNS SPLR
+    --size 5000 \
+    --methods BCD LBFGS-Dual SSNS SPLR \
+    --plot-xlim 1
+
+python synthetic1.py \
+    --task-name 'Synthetic I - Extra' \
+    --reg 0.01 \
+    --size 10000 \
+    --methods BCD LBFGS-Dual SSNS SPLR \
+    --plot-xlim 5
 
 # synthetic data II
 python synthetic2.py \
