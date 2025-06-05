@@ -78,11 +78,11 @@ class MnistOT(BaseOT):
          
     def _get_cost_matrix(self, distance: str | Callable = 'l2') -> None:
         """Get the cost matrix"""
-        if distance == 'l1' or 'cityblock':
+        if distance == 'l1' or distance == 'cityblock':
             distance = lambda x, y: np.linalg.norm(x - y, ord=1)
-        elif distance== 'l2' or 'euclidean':
+        elif distance == 'l2' or distance == 'euclidean':
             distance = lambda x, y: np.linalg.norm(x - y, ord=2)
-        elif distance == 'l2_squared' or 'sqeuclidean':
+        elif distance == 'l2_squared' or distance == 'sqeuclidean':
             distance = lambda x, y: np.linalg.norm(x - y, ord=2) ** 2
         else:
             pass
@@ -130,11 +130,11 @@ class FashionMnistOT(BaseOT):
     
     def _get_cost_matrix(self, distance: str | Callable = 'l2') -> None:
         """Get the cost matrix"""
-        if distance == 'l1' or 'cityblock':
+        if distance == 'l1' or distance == 'cityblock':
             distance = lambda x, y: np.linalg.norm(x - y, ord=1)
-        elif distance== 'l2' or 'euclidean':
+        elif distance == 'l2' or distance == 'euclidean':
             distance = lambda x, y: np.linalg.norm(x - y, ord=2)
-        elif distance == 'l2_squared' or 'sqeuclidean':
+        elif distance == 'l2_squared' or distance == 'sqeuclidean':
             distance = lambda x, y: np.linalg.norm(x - y, ord=2) ** 2
         else:
             pass
@@ -273,11 +273,11 @@ class ImagenetteOT(BaseOT):
     def _get_cost_matrix(self, source_classname: str, target_classname: str,
                         distance: str | Callable = 'l2') -> np.ndarray:
         """Get the distance of the cost matrix"""
-        if distance == 'l1' or 'cityblock':
+        if distance == 'l1' or distance == 'cityblock':
             distance = lambda x, y: np.linalg.norm(x - y, ord=1)
-        elif distance== 'l2' or 'euclidean':
+        elif distance == 'l2' or distance == 'euclidean':
             distance = lambda x, y: np.linalg.norm(x - y, ord=2)
-        elif distance == 'l2_squared' or 'sqeuclidean':
+        elif distance == 'l2_squared' or distance == 'sqeuclidean':
             distance = lambda x, y: np.linalg.norm(x - y, ord=2) ** 2
         """Get the source and target vectors"""
         source_vector = self.read_processed_class(source_classname)
