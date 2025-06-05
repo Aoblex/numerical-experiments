@@ -2,6 +2,7 @@ from typing import List, Callable
 from .datasets import BaseOT
 import os
 import pickle
+import math
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -31,11 +32,11 @@ def setup_logging(log_file=None):
     log_dir = os.path.join(SAVE, LOGS)
     if not os.path.exists(log_dir):
         os.makedirs(log_dir)
-    
+
     if log_file is None:
         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
         log_file = os.path.join(log_dir, f"ot_experiments_{timestamp}.log")
-    
+
     # Configure logging to output to both file and console
     logging.basicConfig(
         level=logging.INFO,
@@ -45,14 +46,13 @@ def setup_logging(log_file=None):
             logging.StreamHandler()
         ]
     )
-    
+
     return logging.getLogger()
 
 # Create logger
 logger = setup_logging()
 
 class OTsolver:
-
     # specifying colors: https://matplotlib.org/stable/users/explain/colors/colors.html
     # specifying line styles: https://matplotlib.org/stable/gallery/lines_bars_and_markers/linestyles.html
     def __init__(
@@ -67,7 +67,7 @@ class OTsolver:
         self.linestyle = kwargs.pop('linestyle', 'solid')
         self.linewidth = kwargs.pop('linewidth', 2.5)
         self.kwargs = kwargs
-    
+
     def solve(self, problem: BaseOT):
         M, a, b = problem.M, problem.a, problem.b
         if self.method_name == 'SPLR' or self.method_name == 'Sparse Newton':
@@ -84,7 +84,6 @@ class OTsolver:
         }
 
 class OTtask:
-
     def __init__(
         self,
         problem: BaseOT,
@@ -98,7 +97,7 @@ class OTtask:
         self.task_name = task_name
         self.pickle_path = pickle_path
         self.plots_path = plots_path
-    
+
     def run(
         self,
         save_pickle: bool = True,
@@ -130,7 +129,7 @@ class OTtask:
                 with open(pickle_path, 'rb') as f:
                     results[solver.method_name] = pickle.load(f)
                 continue
-            
+
             logger.info(f"{solver.method_name} is running...")
             results[solver.method_name] = solver.solve(self.problem)
             logger.info(f"{solver.method_name} iterations: {len(results[solver.method_name]['iterations'])}")
@@ -140,26 +139,26 @@ class OTtask:
                 with open(pickle_path, 'wb') as f:
                     pickle.dump(results[solver.method_name], f)
                 logger.info(f"pickle saved to: {pickle_path}")
-        
-        logger.info(f"Task completed for {self.problem.data_name}: {self.problem.description}")
-        return results 
 
-    
+        logger.info(f"Task completed for {self.problem.data_name}: {self.problem.description}")
+        return results
+
     def plot_for_problem(
         self,
         x_key: str = 'iterations',
         x_label: str = 'Iteration Number',
         y_key: str = 'log10_mar_errs',
         y_label: str = 'Log10 Gradient Norm',
-        force_rerun: bool = True,
+        x_lim: float = math.inf,
+        force_rerun: bool = False,
     ) -> None:
         """Plot a single plot of a single problem with multiple methods"""
-        
+
         logger.info(f"{y_key} vs {x_key} plot for {self.problem.data_name}: {self.problem.description}")
-        
+
         if not os.path.exists(self.plots_path):
             os.makedirs(self.plots_path)
-        
+
         title = self.problem.title
         plt.figure(figsize=(10, 6))
         plt.title(title)
@@ -180,6 +179,10 @@ class OTtask:
                 linewidth=result['linewidth'],
                 label=method_name,
             )
+        # Set x limits
+        left, right = plt.xlim()
+        right = min(right, x_lim)
+        plt.xlim(left=-0.02 * right, right=right)
         # legend
         plt.legend(loc='upper right')
         # save the plot
