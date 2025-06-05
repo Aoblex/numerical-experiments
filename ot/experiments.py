@@ -12,6 +12,7 @@ from datetime import datetime
 SAVE = 'save'
 PICKLE = 'pickle'
 PLOTS = 'plots'
+MATRICES = 'matrices'
 LOGS = 'logs'
 
 # set the plot configurations
@@ -89,17 +90,20 @@ class OTtask:
         problem: BaseOT,
         solvers: List[OTsolver],
         task_name: str,
+        matrices_path: str = os.path.join(SAVE, MATRICES),
         pickle_path: str = os.path.join(SAVE, PICKLE),
         plots_path: str = os.path.join(SAVE, PLOTS),
     ):
         self.problem = problem
         self.solvers = solvers
         self.task_name = task_name
+        self.matrices_path = matrices_path
         self.pickle_path = pickle_path
         self.plots_path = plots_path
 
     def run(
         self,
+        save_matrices: bool = False,
         save_pickle: bool = True,
         force_rerun: bool = True,
     ) -> dict:
@@ -112,6 +116,13 @@ class OTtask:
         """
         logger.info(f"Current dataset: {self.problem.data_name}")
         logger.info(f"Current settings: {self.problem.description}")
+        problem_matrices_path = os.path.join(
+            self.matrices_path,
+            self.problem.data_name,
+            self.problem.description
+        )
+        if not os.path.exists(problem_matrices_path):
+            os.makedirs(problem_matrices_path)
         problem_pickle_path = os.path.join(
             self.pickle_path,
             self.problem.data_name,
@@ -119,6 +130,12 @@ class OTtask:
         )
         if not os.path.exists(problem_pickle_path):
             os.makedirs(problem_pickle_path)
+
+        if save_matrices:
+            matrices_path = os.path.join(problem_matrices_path, "matrices.npz")
+            M, a, b = self.problem.M, self.problem.a, self.problem.b
+            np.savez_compressed(file=matrices_path, M=M, a=a, b=b)
+            logger.info(f"Matrices saved to: {matrices_path}")
 
         results = {}
         for solver in self.solvers:
@@ -151,6 +168,7 @@ class OTtask:
         y_label: str = 'Log10 Gradient Norm',
         x_lim: float = math.inf,
         force_rerun: bool = False,
+        **kwargs,
     ) -> None:
         """Plot a single plot of a single problem with multiple methods"""
 
@@ -167,7 +185,7 @@ class OTtask:
         plt.grid(True)
 
         # plot the solutions
-        results = self.run(save_pickle=True, force_rerun=force_rerun)
+        results = self.run(save_pickle=True, force_rerun=force_rerun, **kwargs)
         for method_name, result in results.items():
             # plot the solution
             x = result[x_key]
