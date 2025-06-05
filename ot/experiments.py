@@ -70,7 +70,7 @@ class OTsolver:
     
     def solve(self, problem: BaseOT):
         M, a, b = problem.M, problem.a, problem.b
-        if self.method_name == 'SPLR':
+        if self.method_name == 'SPLR' or self.method_name == 'Sparse Newton':
             self.kwargs['density'] = 10 / min(len(a), len(b))
         result = self.method(M, a, b, **self.kwargs)
         return {
