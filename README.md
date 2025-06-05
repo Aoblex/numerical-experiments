@@ -2,24 +2,35 @@
 
 This is an improved version of the repository [SSNS](https://github.com/TangZihao1997/SSNS),
 which is used to run the numerical experiments
-in the paper [SSNS](https://openreview.net/forum?id=Nmmiyjw7Xg) and [SPLR](https://www.baidu.com/)
+in the paper [SSNS](https://openreview.net/forum?id=Nmmiyjw7Xg) and [SPLR](https://openreview.net/forum?id=WCkMkMcqpb).
 
 ## Environment Preparation
 
-Create a new environment `num`, install dependencies
+### Basic Packages
+
+Create a new environment `num`, and install dependencies.
+
 ```bash
 conda create -n num python=3.13
 conda activate num
-conda install pip
 pip install scikit-learn scipy tqdm numpy seaborn ipykernel
 pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
 ```
 
-### Installing the Latest Version of [regot-python](https://github.com/yixuan/regot-python)
+### Installing RegOT
+
+Directly install using `pip`:
+
+```bash
+pip install regot
+```
+
+Or to install the latest version of [regot-python](https://github.com/yixuan/regot-python):
 
 ```bash
 conda activate num
-git clone --depth=1 https://github.com/yixuan/regot-python.git 
+conda install gxx_linux-64
+git clone --depth=1 https://github.com/yixuan/regot-python.git
 cd regot-python
 pip install . -r requirements.txt
 ```
