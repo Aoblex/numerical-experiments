@@ -55,3 +55,4 @@ for reg in reg_list:
                                          y_label='Log10 Gradient Norm',
                                          x_lim=plot_xlim,
                                          force_rerun=force_rerun)
+
