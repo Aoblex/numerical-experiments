@@ -80,13 +80,13 @@ def main(n, m, num_zeros, stride, repeat):
         os.makedirs(eigen_path)
 
     plt.figure(num=1, figsize=(10, 6), dpi=300)
-    plt.title(f'Hessian Eigenvalues (n={n}, m={m})')
+    plt.title(rf'Hessian Eigenvalues ($n={n}, m={m}$)')
     plt.xlabel('Sparsification Step')
     plt.ylabel('Eigenvalue')
     plt.grid(True)
 
     plt.figure(num=2, figsize=(10, 6), dpi=300)
-    plt.title(f'Hessian Condition Number (n={n}, m={m})')
+    plt.title(rf'Hessian Condition Number ($n={n}, m={m}$)')
     plt.xlabel('Sparsification Step')
     plt.ylabel('Log10 Condition Number')
     plt.grid(True)
@@ -109,12 +109,12 @@ def main(n, m, num_zeros, stride, repeat):
     plt.figure(num=1)
     plt.legend(loc='upper right')
     plt.tight_layout()
-    plt.savefig(os.path.join(eigen_path, f'eigenvalues_n{n}_m{m}.png'))
+    plt.savefig(os.path.join(eigen_path, f'eigenvalues_n{n}_m{m}.pdf'), bbox_inches='tight')
 
     plt.figure(num=2)
     plt.legend(loc='upper right')
     plt.tight_layout()
-    plt.savefig(os.path.join(eigen_path, f'condition_number_n{n}_m{m}.png'))
+    plt.savefig(os.path.join(eigen_path, f'condition_number_n{n}_m{m}.pdf'), bbox_inches='tight')
 
     plt.close('all')
 
@@ -141,3 +141,4 @@ if __name__ == "__main__":
     repeat = args.repeat
 
     main(n, m, num_zeros, stride, repeat)
+

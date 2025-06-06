@@ -1,4 +1,5 @@
 import argparse
+import math
 from utils import get_solvers
 from ot.datasets import MnistOT
 from ot.experiments import OTtask
@@ -22,6 +23,8 @@ parser.add_argument('--tol', type=float, default=1e-6,
                     help='Tolerance for convergence (default: 1e-6)')
 parser.add_argument('--methods', nargs='+', type=str, default=None,
                     help='List of methods to use, separated by space(default: suitable methods)')
+parser.add_argument('--plot-xlim', type=float, default=math.inf,
+                    help='The x-axis of the plot will be limited at this value for better visualization (default: math.inf)')
 parser.add_argument('--force-rerun', action='store_true',
                     help='Force rerun of the experiments even if results exist')
 args = parser.parse_args()
@@ -30,6 +33,7 @@ task_name = args.task_name
 reg_list = args.reg
 norm_list = args.norm
 max_iter, tol = args.max_iter, args.tol
+plot_xlim = args.plot_xlim
 idx_pairs = list(zip(args.source, args.target))
 mnist_methods = args.methods if args.methods else [
     'BCD', 'APDAGD', # first-order methods
@@ -61,4 +65,6 @@ for reg in reg_list:
             mnist_task.plot_for_problem(x_key='run_times',
                                         x_label='Run time(seconds)',
                                         y_label='Log10 Gradient Norm',
+                                        x_lim=plot_xlim,
                                         force_rerun=force_rerun)
+

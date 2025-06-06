@@ -1,8 +1,10 @@
 import argparse
+import math
 from utils import get_solvers
 from ot.datasets import FashionMnistOT
 from ot.experiments import OTtask
 
+# Parse command line arguments
 parser = argparse.ArgumentParser(description='Run Fashion-MNIST OT experiments')
 parser.add_argument('--task-name', type=str, default="FashionMNIST",
                     help='Name of current OT task, also the name of plot folder (default: FashionMNIST)')
@@ -21,6 +23,8 @@ parser.add_argument('--tol', type=float, default=1e-6,
                     help='Tolerance for convergence (default: 1e-6)')
 parser.add_argument('--methods', nargs='+', type=str, default=None,
                     help='List of methods to use, separated by space(default: all methods)')
+parser.add_argument('--plot-xlim', type=float, default=math.inf,
+                    help='The x-axis of the plot will be limited at this value for better visualization (default: math.inf)')
 parser.add_argument('--force-rerun', action='store_true',
                     help='Force rerun of the experiments even if results exist')
 args = parser.parse_args()
@@ -29,6 +33,7 @@ task_name = args.task_name
 reg_list = args.reg
 norm_list = args.norm
 max_iter, tol = args.max_iter, args.tol
+plot_xlim = args.plot_xlim
 idx_pairs = list(zip(args.source, args.target))
 fashion_mnist_methods = args.methods
 force_rerun = args.force_rerun
@@ -56,4 +61,6 @@ for reg in reg_list:
             fashion_mnist_task.plot_for_problem(x_key='run_times',
                                                 x_label='Run time(seconds)',
                                                 y_label='Log10 Gradient Norm',
+                                                x_lim=plot_xlim,
                                                 force_rerun=force_rerun)
+

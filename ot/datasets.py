@@ -14,7 +14,6 @@ from abc import abstractmethod
 ROOT = './data'
 
 class BaseOT:
-
     def __init__(
         self,
     ) -> None:
@@ -27,19 +26,19 @@ class BaseOT:
     @abstractmethod
     def _get_distribution(self, *args, **kwargs) -> np.ndarray:
         raise NotImplementedError
-    
+
     @abstractmethod
     def _get_cost_matrix(self, *args, **kwargs) -> np.ndarray:
         raise NotImplementedError
-    
+
     @property
     def a(self) -> np.ndarray:
         return self.source_distribution
-    
+
     @property
     def b(self) -> np.ndarray:
         return self.target_distribution
-    
+
     @property
     def M(self) -> np.ndarray:
         return self.cost_matrix
@@ -67,22 +66,27 @@ class MnistOT(BaseOT):
         self.target_distribution = self._get_distribution(target_idx)
         self.cost_matrix = self._get_cost_matrix(distance)
         self.description = f"ID1={source_idx}, ID2={target_idx}, norm={distance}, reg={reg}"
-        self.title = f"MNIST(ID1={source_idx}, ID2={target_idx})"
+        norm_str = distance
+        if distance == 'l1' or distance == 'cityblock':
+            norm_str = r'$\ell_1$-norm'
+        elif distance == 'l2' or distance == 'euclidean':
+            norm_str = r'$\ell_2$-norm'
+        self.title = rf"MNIST (ID1={source_idx}, ID2={target_idx}, {norm_str}, $\eta={reg}$)"
         self.data_name = "MNIST"
-    
+
     def _get_distribution(self, idx: int, eps: float = 0.001) -> np.ndarray:
         """Get the smoothed source/target distribution"""
         digit_np = self.mnist[idx][0]
         dist = digit_np / np.sum(digit_np)
         return (1 - eps) * dist + eps / self.n_flattend
-         
+
     def _get_cost_matrix(self, distance: str | Callable = 'l2') -> None:
         """Get the cost matrix"""
-        if distance == 'l1' or 'cityblock':
+        if distance == 'l1' or distance == 'cityblock':
             distance = lambda x, y: np.linalg.norm(x - y, ord=1)
-        elif distance== 'l2' or 'euclidean':
+        elif distance == 'l2' or distance == 'euclidean':
             distance = lambda x, y: np.linalg.norm(x - y, ord=2)
-        elif distance == 'l2_squared' or 'sqeuclidean':
+        elif distance == 'l2_squared' or distance == 'sqeuclidean':
             distance = lambda x, y: np.linalg.norm(x - y, ord=2) ** 2
         else:
             pass
@@ -93,9 +97,9 @@ class MnistOT(BaseOT):
         for i in range(MnistOT.n_flattend):
             for j in range(MnistOT.n_flattend):
                 cost_matrix[i, j] = distance(coordinates[i], coordinates[j])
-        
+
         return cost_matrix / np.max(cost_matrix)
-    
+
 
 class FashionMnistOT(BaseOT):
     n, n_flattend = 28, 784
@@ -119,22 +123,27 @@ class FashionMnistOT(BaseOT):
         self.target_distribution = self._get_distribution(target_idx)
         self.cost_matrix = self._get_cost_matrix(distance)
         self.description = f"ID1={source_idx}, ID2={target_idx}, norm={distance}, reg={reg}"
-        self.title = f"FashionMNIST(ID1={source_idx}, ID2={target_idx})"
+        norm_str = distance
+        if distance == 'l1' or distance == 'cityblock':
+            norm_str = r'$\ell_1$-norm'
+        elif distance == 'l2' or distance == 'euclidean':
+            norm_str = r'$\ell_2$-norm'
+        self.title = rf"FashionMNIST (ID1={source_idx}, ID2={target_idx}, {norm_str}, $\eta={reg}$)"
         self.data_name = "FashionMNIST"
-    
+
     def _get_distribution(self, idx: int, eps: float = 0.001) -> np.ndarray:
         """Get the smoothed source/target distribution"""
         digit_np = self.fashion_mnist[idx][0]
         dist = digit_np / np.sum(digit_np)
         return (1 - eps) * dist + eps / self.n_flattend
-    
+
     def _get_cost_matrix(self, distance: str | Callable = 'l2') -> None:
         """Get the cost matrix"""
-        if distance == 'l1' or 'cityblock':
+        if distance == 'l1' or distance == 'cityblock':
             distance = lambda x, y: np.linalg.norm(x - y, ord=1)
-        elif distance== 'l2' or 'euclidean':
+        elif distance == 'l2' or distance == 'euclidean':
             distance = lambda x, y: np.linalg.norm(x - y, ord=2)
-        elif distance == 'l2_squared' or 'sqeuclidean':
+        elif distance == 'l2_squared' or distance == 'sqeuclidean':
             distance = lambda x, y: np.linalg.norm(x - y, ord=2) ** 2
         else:
             pass
@@ -145,9 +154,9 @@ class FashionMnistOT(BaseOT):
         for i in range(FashionMnistOT.n_flattend):
             for j in range(FashionMnistOT.n_flattend):
                 cost_matrix[i, j] = distance(coordinates[i], coordinates[j])
-        
+
         return cost_matrix / np.max(cost_matrix)
-    
+
 
 class ImagenetteOT(BaseOT):
     """
@@ -201,7 +210,12 @@ class ImagenetteOT(BaseOT):
         self.cost_matrix = self._get_cost_matrix(source_classname, target_classname, distance)
         self.description = f"CLASS1={source_classname}, CLASS2={target_classname}, dim={dim}, norm={distance}, reg={reg}"
         capitalize = lambda s: s[0].upper() + s[1:] if len(s) > 0 else s
-        self.title = f"ImageNet({capitalize(source_classname)} vs {capitalize(target_classname)}, eta={reg})"
+        norm_str = distance
+        if distance == 'l1' or distance == 'cityblock':
+            norm_str = r'$\ell_1$-norm'
+        elif distance == 'l2' or distance == 'euclidean':
+            norm_str = r'$\ell_2$-norm'
+        self.title = rf"ImageNet ({capitalize(source_classname)} vs {capitalize(target_classname)}, {norm_str}, $\eta={reg}$)"
         self.data_name = "Imagenette"
 
     def _get_classname(self, idx: int):
@@ -219,10 +233,10 @@ class ImagenetteOT(BaseOT):
                 input_tensor = module(input_tensor)
                 if name == layer_name:
                     return input_tensor.squeeze().numpy()
-        
+
         # if the layer name is not found, return the last layer
         return input_tensor.squeeze().numpy()
-    
+
     def read_all_class(self):
         """Read the processed Imagenette dataset"""
         save_path = os.path.join(self.root, f'imagenette2-{self.dim}.pkl')
@@ -250,16 +264,16 @@ class ImagenetteOT(BaseOT):
             classname = self._get_classname(idx)
             if classname not in input_dict:
                 input_dict[classname] = []
-            
+
             converted_img = self._get_layer_output(img, layer_name)
             input_dict[classname].append(converted_img)
-        
+
         # do PCA on the vectors
         pca = PCA(n_components=self.dim)
         for classname, vectors in input_dict.items():
             np_vectors = np.array(vectors)
             input_dict[classname] = pca.fit_transform(np_vectors)
-        
+
         # save the dictionary
         with open(save_path, 'wb') as f:
             pickle.dump(input_dict, f)
@@ -269,15 +283,15 @@ class ImagenetteOT(BaseOT):
         vectors = self.read_processed_class(classname)
         n = vectors.shape[0]
         return 1.0 / n * np.ones(n)
-    
+
     def _get_cost_matrix(self, source_classname: str, target_classname: str,
                         distance: str | Callable = 'l2') -> np.ndarray:
         """Get the distance of the cost matrix"""
-        if distance == 'l1' or 'cityblock':
+        if distance == 'l1' or distance == 'cityblock':
             distance = lambda x, y: np.linalg.norm(x - y, ord=1)
-        elif distance== 'l2' or 'euclidean':
+        elif distance == 'l2' or distance == 'euclidean':
             distance = lambda x, y: np.linalg.norm(x - y, ord=2)
-        elif distance == 'l2_squared' or 'sqeuclidean':
+        elif distance == 'l2_squared' or distance == 'sqeuclidean':
             distance = lambda x, y: np.linalg.norm(x - y, ord=2) ** 2
         """Get the source and target vectors"""
         source_vector = self.read_processed_class(source_classname)
@@ -290,6 +304,7 @@ class ImagenetteOT(BaseOT):
                 cost_matrix[i, j] = distance(source_vector[i], target_vector[j])
 
         return cost_matrix / np.max(cost_matrix)
+
 
 class Synthetic1OT(BaseOT):
 
@@ -309,9 +324,9 @@ class Synthetic1OT(BaseOT):
         self.target_distribution = np.ones(m) / m
         self.cost_matrix = self.rng.uniform(0, 1, (n, m))
         self.description = f"n={n}, m={m}, reg={reg}"
-        self.title = f"Synthetic I (n=m={n})"
+        self.title = rf"Synthetic I ($n=m={n}, \eta={reg}$)"
         self.data_name = "Synthetic I"
-    
+
 class Synthetic2OT(BaseOT):
 
     def __init__(
@@ -330,5 +345,5 @@ class Synthetic2OT(BaseOT):
         self.cost_matrix = self.cost_matrix / np.max(self.cost_matrix)
         self.reg = reg
         self.description = f"n={n}, m={m}, reg={reg}"
-        self.title = f"Synthetic II (n=m={n})"
+        self.title = rf"Synthetic II ($n=m={n}, \eta={reg}$)"
         self.data_name = "Synthetic II"
