@@ -207,7 +207,14 @@ python imagenette.py \
 ################################
 
 python sparse_eigen.py \
+    --n 30 \
+    --m 30 \
+    --stride 10 \
+    --repeat 5
+
+python sparse_eigen.py \
     --n 100 \
     --m 100 \
     --stride 50 \
-    --repeat 10 
+    --repeat 10
+
