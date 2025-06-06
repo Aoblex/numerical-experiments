@@ -10,8 +10,8 @@ python mnist.py \
     --norm l1 \
     --source     2   239 17390 34860 \
     --target 54698 43981 49947 45815 \
-    --methods BCD APDAGD LBFGS-Dual Newton SSNS SPLR
-
+    --methods BCD APDAGD LBFGS-Dual Newton SSNS SPLR \
+    --plot-xlim 3
 
 #################
 # Fashion-MNIST #
@@ -23,7 +23,8 @@ python fashion_mnist.py \
     --norm l1 \
     --source     2   239 17390 34860 \
     --target 54698 43981 49947 45815 \
-    --methods BCD APDAGD LBFGS-Dual Newton SSNS SPLR
+    --methods BCD APDAGD LBFGS-Dual Newton SSNS SPLR \
+    --plot-xlim 3
 
 ############
 # ImageNet #
@@ -36,6 +37,7 @@ python imagenette.py \
     --source 'tench' \
     --target 'cassette player' \
     --methods BCD APDAGD LBFGS-Dual Newton SSNS SPLR \
+    --plot-xlim 4 \
     --save-matrices
 
 ####################
@@ -103,25 +105,27 @@ python synthetic2.py \
 python mnist.py \
     --task-name 'MNIST - Extra' \
     --reg 0.01 \
-    --norm l2 \
+    --norm l1 \
     --source     2   239 17390 34860 \
     --target 54698 43981 49947 45815 \
-    --methods BCD APDAGD LBFGS-Dual Newton SSNS SPLR
+    --methods BCD APDAGD LBFGS-Dual Newton SSNS SPLR \
+    --plot-xlim 2
 
 # Fashion-MNIST
 python fashion_mnist.py \
     --task-name 'FashionMNIST - Extra' \
     --reg 0.01 \
-    --norm l2 \
+    --norm l1 \
     --source     2   239 17390 34860 \
     --target 54698 43981 49947 45815 \
-    --methods BCD APDAGD LBFGS-Dual Newton SSNS SPLR
+    --methods BCD APDAGD LBFGS-Dual Newton SSNS SPLR \
+    --plot-xlim 2
 
 # ImageNet
 python imagenette.py \
     --task-name 'ImageNet - Extra' \
-    --reg 0.01 0.001 \
-    --norm l1 l2 \
+    --reg 0.01 \
+    --norm l1 \
     --source 'tench'           'tench'  'tench'         'tench' \
     --target 'cassette player' 'church' 'garbage truck' 'golf ball' \
     --methods BCD APDAGD LBFGS-Dual Newton SSNS SPLR \
@@ -140,7 +144,7 @@ python synthetic1.py \
     --reg 0.01 \
     --size 5000 \
     --methods BCD LBFGS-Dual SSNS SPLR \
-    --plot-xlim 1
+    --plot-xlim 1.5
 
 python synthetic1.py \
     --task-name 'Synthetic I - Extra' \
@@ -154,13 +158,49 @@ python synthetic2.py \
     --task-name 'Synthetic II - Extra' \
     --reg 0.01 \
     --size 1000 \
-    --methods BCD APDAGD LBFGS-Dual Newton SSNS SPLR
+    --methods BCD APDAGD LBFGS-Dual Newton SSNS SPLR \
+    --plot-xlim 2
 
 python synthetic2.py \
     --task-name 'Synthetic II - Extra' \
     --reg 0.01 \
     --size 5000 10000 \
     --methods BCD LBFGS-Dual SSNS SPLR
+
+#################################
+# Extra test examples (l2-norm) #
+#################################
+
+# MNIST
+python mnist.py \
+    --task-name 'MNIST - Extra' \
+    --reg 0.001 \
+    --norm l2 \
+    --source     2   239 17390 34860 \
+    --target 54698 43981 49947 45815 \
+    --methods BCD APDAGD LBFGS-Dual Newton SSNS SPLR \
+    --plot-xlim 3
+
+# Fashion-MNIST
+python fashion_mnist.py \
+    --task-name 'FashionMNIST - Extra' \
+    --reg 0.001 \
+    --norm l2 \
+    --source     2   239 17390 34860 \
+    --target 54698 43981 49947 45815 \
+    --methods BCD APDAGD LBFGS-Dual Newton SSNS SPLR \
+    --plot-xlim 3
+
+# ImageNet
+python imagenette.py \
+    --task-name 'ImageNet - Extra' \
+    --reg 0.001 \
+    --norm l2 \
+    --source 'tench'           'tench'  'tench'         'tench' \
+    --target 'cassette player' 'church' 'garbage truck' 'golf ball' \
+    --methods BCD APDAGD LBFGS-Dual Newton SSNS SPLR \
+    --plot-xlim 4 \
+    --save-matrices
 
 ################################
 # Eigenvalue of Sparse Hessian #
